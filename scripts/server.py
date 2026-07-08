@@ -1,6 +1,7 @@
 # pyrefly: ignore [missing-import]
 import re
 import os
+import math
 # pyrefly: ignore [missing-import]
 # pyrefly: ignore [missing-import]
 import duckdb
@@ -19,13 +20,42 @@ from fastapi import Query
 # pyrefly: ignore [missing-import]
 from fastapi import Response
 # pyrefly: ignore [missing-import]
+from fastapi.responses import JSONResponse
+# pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 # pyrefly: ignore [missing-import]
 from pydantic import BaseModel
 # pyrefly: ignore [missing-import]
 import polars as pl
+# pyrefly: ignore [missing-import]
+from dotenv import load_dotenv
 
-app = FastAPI(title="Retail BI OLAP Engine API", version="1.0.0")
+# Load environment variables from .env file (resolved from project root)
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
+import json
+
+def _nan_safe_json(obj):
+    """Recursively replace NaN/Inf floats with None so JSON serialization never fails."""
+    if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+        return None
+    if isinstance(obj, dict):
+        return {k: _nan_safe_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_nan_safe_json(i) for i in obj]
+    return obj
+
+class NaNSafeJSONResponse(JSONResponse):
+    """FastAPI response class that silently converts NaN/Inf to null."""
+    def render(self, content) -> bytes:
+        return json.dumps(
+            _nan_safe_json(content),
+            ensure_ascii=False,
+            allow_nan=False,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
+app = FastAPI(title="Retail BI OLAP Engine API", version="1.0.0", default_response_class=NaNSafeJSONResponse)
 
 # CORS setup
 app.add_middleware(
@@ -44,7 +74,6 @@ def get_db():
 # Request Models
 class AIQueryRequest(BaseModel):
     query: str
-    gemini_key: Optional[str] = None
 
 # Helper: validate SQL
 def is_safe_sql(sql: str) -> bool:
@@ -526,36 +555,119 @@ def find_cached_query(query: str, threshold: float = 0.85) -> Optional[str]:
         return best_match
     return None
 
+def fix_union_order_by(sql: str) -> str:
+    """
+    DuckDB requires every UNION / UNION ALL branch that contains ORDER BY or LIMIT
+    to be wrapped in parentheses. This function detects the pattern and fixes it
+    automatically so Gemini-generated queries don't fail at execution time.
+    """
+    union_pattern = re.compile(
+        r'(?i)(UNION\s+ALL|UNION)\s+(SELECT)',
+    )
+    if not union_pattern.search(sql):
+        return sql  # no UNION – nothing to do
+
+    # Split on UNION / UNION ALL boundaries (keep delimiter in tokens)
+    tokens = re.split(r'(?i)(UNION\s+ALL|UNION)', sql)
+    # tokens = [branch0, 'UNION ALL', branch1, 'UNION ALL', branch2, ...]
+    fixed_parts = []
+    for i, tok in enumerate(tokens):
+        if re.match(r'(?i)UNION(\s+ALL)?', tok.strip()):
+            fixed_parts.append(tok)
+            continue
+        branch = tok.strip()
+        # Only wrap if it contains ORDER BY or LIMIT and isn't already parenthesized
+        needs_wrap = re.search(r'(?i)(ORDER\s+BY|LIMIT)', branch)
+        already_wrapped = branch.startswith('(') and branch.endswith(')')
+        if needs_wrap and not already_wrapped:
+            branch = f"({branch})"
+        fixed_parts.append(branch)
+    return '\n'.join(fixed_parts)
+
 # System prompt with database schema metadata
-SQL_GEN_SYSTEM_PROMPT = """You are an expert SQL engineer. Your task is to translate natural language user questions into read-only DuckDB SQL queries.
-Return ONLY valid, executable DuckDB SQL. Do NOT include markdown code blocks, backticks, or any explanatory text. Simply return the raw SQL.
+SQL_GEN_SYSTEM_PROMPT = """DuckDB SQL expert. Translate natural language to a single read-only SELECT. Output raw SQL only — no markdown, backticks, or prose.
+Rules: SELECT only. Aliases usable in HAVING/ORDER BY, not WHERE. Single quotes for strings, double quotes for identifiers with spaces. Always LIMIT unless user says otherwise.
+Product rule: whenever any product column (DESC1, MRP, RATE, Sales, Profit, etc.) appears in SELECT, always also include p.ICODE as the first product column — it is the barcode/SKU identifier.
+Currency rule: all monetary values are in Indian Rupees. Never use $ or USD. Format amounts with the ₹ symbol in column aliases when helpful (e.g. "Sales_₹").
 
-Important constraints:
-- Only SELECT queries are allowed. Absolutely no DML operations (INSERT, UPDATE, DELETE, DROP, CREATE, ALTER) are allowed.
-- The schema is:
-  - Dim_Product (Product_ID INTEGER, ICODE VARCHAR, DESC1 VARCHAR, DESC2 VARCHAR, DESC3 VARCHAR, MRP DOUBLE, RATE DOUBLE, GENERATED VARCHAR, STOCKINDATE TIMESTAMP)
-  - Dim_Supplier (Supplier_ID INTEGER, PARTYNAME VARCHAR)
-  - Dim_Category (Category_ID INTEGER, "Category 1" VARCHAR, "Category 2" VARCHAR, "Category 3" VARCHAR, "Category 4" VARCHAR, "Category 5" VARCHAR, "Category 6" VARCHAR, GRP_REM VARCHAR)
-  - Dim_Organization (Org_ID INTEGER, Division VARCHAR, Section VARCHAR, Department VARCHAR)
-  - Dim_Store (Store_ID INTEGER, ADMSITE_CODE VARCHAR)
-  - Dim_Date (Date_ID INTEGER, Date TIMESTAMP, Year INTEGER, Quarter INTEGER, Month INTEGER, MonthName VARCHAR, Day INTEGER, DayOfWeek INTEGER)
-  - Fact_Inventory_Sales (Product_ID INTEGER, Supplier_ID INTEGER, Category_ID INTEGER, Org_ID INTEGER, Store_ID INTEGER, Date_ID INTEGER, OPENING_QUANTITY DOUBLE, OPENING_AMOUNT DOUBLE, GOODS_RECEIVE_QUANTITY DOUBLE, GOODS_RECEIVE_AMOUNT DOUBLE, GOODS_RETURN_QUANTITY DOUBLE, GOODS_RETURN_AMOUNT DOUBLE, SITE_TRANSFER_IN_QUANTITY DOUBLE, SITE_TRANSFER_IN_AMOUNT DOUBLE, SITE_TRANSFER_OUT_QUANTITY DOUBLE, SITE_TRANSFER_OUT_AMOUNT DOUBLE, CONVERSION_ISSUE_QUANTITY DOUBLE, CONVERSION_ISSUE_AMOUNT DOUBLE, CONVERSION_RECEIVE_QUANTITY DOUBLE, CONVERSION_RECEIVE_AMOUNT DOUBLE, NET_SALE_AMOUNT DOUBLE, NET_SALE_COGS_AMOUNT DOUBLE, ADJUSTMENT_QUANTITY DOUBLE, ADJUSTMENT_AMOUNT DOUBLE, MISC_ISSUE_RECEIVE_QUANTITY DOUBLE, MISC_ISSUE_RECEIVE_AMOUNT DOUBLE, CLOSING_STOCK_QUANTITY DOUBLE, CLOSING_STOCK_AMOUNT DOUBLE, CLOSING_TRANSIT_QUANTITY DOUBLE, CLOSING_TRANSIT_AMOUNT DOUBLE)
-  - Fact_Financial_Metrics (View joining Fact_Inventory_Sales and Dim_Product containing all columns from Fact_Inventory_Sales plus MRP, RATE, NET_SALE_QUANTITY, Gross_Profit, Gross_Margin_Pct, Markup_Pct, Inventory_Cost, Potential_Revenue, Inventory_Worth)
-  - Product_ABC_Classification (Product_ID INTEGER, Cumulative_Revenue DOUBLE, ABC_Class VARCHAR)
-  - Product_XYZ_Classification (Product_ID INTEGER, Avg_Qty DOUBLE, Stdev_Qty DOUBLE, CV_Pct DOUBLE, XYZ_Class VARCHAR)
-  - Product_Stock_Velocity (Product_ID INTEGER, Avg_STR DOUBLE, Velocity_Class VARCHAR)
+SCHEMA (join all facts to dims on surrogate _ID keys):
+Dim_Product(Product_ID PK, ICODE varchar/*barcode/SKU — always SELECT this for any product query*/, DESC1 varchar/*product name*/, MRP double/*max retail price ₹*/, RATE double/*cost ₹*/, STOCKINDATE timestamp)
+Dim_Supplier(Supplier_ID PK, PARTYNAME varchar/*vendor name*/)
+Dim_Category(Category_ID PK, "Category 1" varchar/*top*/, "Category 2", "Category 3", "Category 4", "Category 5", "Category 6", GRP_REM varchar)  -- always quote spaced cols: cat."Category 1"
+Dim_Organization(Org_ID PK, Division, Section, Department varchar)
+Dim_Store(Store_ID PK, ADMSITE_CODE varchar)
+Dim_Date(Date_ID PK, Date timestamp, Year int, Quarter int, Month int, MonthName varchar, Day int, DayOfWeek int)
 
-Note: Always use correct DuckDB SQL syntax. When joining, match key IDs (e.g. JOIN Dim_Product p ON f.Product_ID = p.Product_ID). Column names with spaces like "Category 1" must be quoted using double quotes (cat."Category 1").
-Limit returned records to a reasonable number (e.g. LIMIT 10) unless a specific count is asked."""
+Fact_Inventory_Sales(Product_ID, Supplier_ID, Category_ID, Org_ID, Store_ID, Date_ID,  -- all FK to dims above
+  OPENING_QUANTITY, OPENING_AMOUNT, GOODS_RECEIVE_QUANTITY, GOODS_RECEIVE_AMOUNT,
+  GOODS_RETURN_QUANTITY, GOODS_RETURN_AMOUNT, SITE_TRANSFER_IN_QUANTITY, SITE_TRANSFER_IN_AMOUNT,
+  SITE_TRANSFER_OUT_QUANTITY, SITE_TRANSFER_OUT_AMOUNT, ADJUSTMENT_QUANTITY, ADJUSTMENT_AMOUNT,
+  MISC_ISSUE_RECEIVE_QUANTITY, MISC_ISSUE_RECEIVE_AMOUNT,
+  NET_SALE_AMOUNT double/*primary sales KPI*/, NET_SALE_COGS_AMOUNT double,
+  CLOSING_STOCK_QUANTITY, CLOSING_STOCK_AMOUNT, CLOSING_TRANSIT_QUANTITY, CLOSING_TRANSIT_AMOUNT  -- all double)
 
-REPORT_GEN_SYSTEM_PROMPT = """You are a senior business intelligence and inventory analyst.
-You will be given:
-1. The user's natural language request.
-2. The DuckDB SQL query that was run.
-3. The raw tabular results from the query execution (represented in JSON format).
+Fact_Financial_Metrics  -- VIEW = Fact_Inventory_Sales + Dim_Product extras. USE THIS for profit/margin/markup/inventory worth queries.
+  Extra cols: NET_SALE_QUANTITY, Gross_Profit/*sale-cogs*/, Gross_Margin_Pct, Markup_Pct, Inventory_Cost/*qty*rate*/, Potential_Revenue/*qty*MRP*/, Inventory_Worth, MRP, RATE
 
-Please write a brief, executive word report summarizing these results. Keep it professional, conversational, and highly insightful.
-Use clean markdown layout (e.g. simple headers, bold text, bullet points). Highlight key takeaways, anomalies, or important figures for the business. Keep the report brief (1-3 paragraphs or a few bullet points)."""
+Product_ABC_Classification(Product_ID, Cumulative_Revenue, ABC_Class varchar)  -- 'A'|'B'|'C'
+Product_XYZ_Classification(Product_ID, Avg_Qty, Stdev_Qty, CV_Pct, XYZ_Class varchar)  -- 'X'stable|'Y'variable|'Z'erratic
+Product_Stock_Velocity(Product_ID, Avg_STR, Velocity_Class varchar)  -- 'Fast'|'Medium'|'Slow'
+
+PATTERNS:
+sales/revenue → SUM(NET_SALE_AMOUNT) | profit → SUM(Gross_Profit) via Fact_Financial_Metrics
+top N → ORDER BY metric DESC LIMIT N | second best → LIMIT 1 OFFSET 1
+dead stock → Product_ID NOT IN (SELECT DISTINCT Product_ID FROM Fact_Inventory_Sales WHERE NET_SALE_AMOUNT>0)
+date filter → JOIN Dim_Date d ON f.Date_ID=d.Date_ID WHERE d.Year=2024
+
+DuckDB UNION rule: When using UNION ALL / UNION, each branch that has ORDER BY or LIMIT MUST be wrapped in parentheses.
+Correct:  (SELECT ... ORDER BY x LIMIT 5) UNION ALL (SELECT ... ORDER BY x ASC LIMIT 5)
+Wrong:    SELECT ... ORDER BY x LIMIT 5 UNION ALL SELECT ... ORDER BY x ASC LIMIT 5
+
+EXAMPLES:
+Q: second best supplier by sales
+SELECT sup.PARTYNAME, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Supplier sup ON f.Supplier_ID=sup.Supplier_ID GROUP BY sup.PARTYNAME ORDER BY Sales DESC LIMIT 1 OFFSET 1
+
+Q: top 5 products by profit
+SELECT p.ICODE, p.DESC1, SUM(f.Gross_Profit) AS Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Profit DESC LIMIT 5
+
+Q: best and worst 5 products by sales
+WITH s AS (SELECT p.DESC1 AS Product, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.DESC1)
+(SELECT 'Best' AS Category, Product, Sales FROM s ORDER BY Sales DESC LIMIT 5)
+UNION ALL
+(SELECT 'Worst' AS Category, Product, Sales FROM s ORDER BY Sales ASC LIMIT 5)
+"""
+
+REPORT_GEN_SYSTEM_PROMPT = """You are a senior Business Intelligence and Inventory Analyst.
+
+You will receive:
+1. The user's question.
+2. The SQL query.
+3. The query results (JSON).
+
+Write an executive business report.
+
+Requirements:
+- Use Markdown.
+- Use short sections.
+- Keep the report under 150 words.
+- Base every statement strictly on the supplied data.
+- Highlight important figures and rankings.
+- Mention anomalies only if clearly supported.
+
+Currency Rules (MANDATORY):
+- All monetary values are Indian Rupees.
+- Always use the ₹ symbol.
+- Never output $, USD, Dollar, Dollars, EUR, Euro or €.
+- Never perform currency conversion.
+
+Formatting:
+- Use Indian number formatting.
+- Use concise bullet points where appropriate."""
+
+@app.get("/api/v1/ai/suggestions")
+def get_ai_suggestions():
+    """Return all cached query strings for frontend autocomplete."""
+    return {"suggestions": sorted(query_cache.keys())}
 
 @app.post("/api/v1/ai/query")
 def ai_semantic_query(req: AIQueryRequest):
@@ -571,7 +683,7 @@ def ai_semantic_query(req: AIQueryRequest):
         cache_hit = True
     else:
         # Generate query using Gemini API
-        api_key = req.gemini_key or os.environ.get("GEMINI_API_KEY")
+        api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
             # Fallback to standard matching in case API key is not configured yet
             q = raw_query.lower()
@@ -594,7 +706,7 @@ def ai_semantic_query(req: AIQueryRequest):
             try:
                 client = genai.Client(api_key=api_key)
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-2.5-flash-lite',
                     contents=raw_query,
                     config={"system_instruction": SQL_GEN_SYSTEM_PROMPT}
                 )
@@ -602,7 +714,7 @@ def ai_semantic_query(req: AIQueryRequest):
                 # Clean markdown styling if Gemini accidentally returned it
                 if sql_response.startswith("```"):
                     sql_response = re.sub(r"^```sql\s*|^```\s*|```$", "", sql_response, flags=re.MULTILINE).strip()
-                sql = sql_response
+                sql = fix_union_order_by(sql_response)
                 # Save to cache
                 query_cache[raw_query.lower()] = sql
             except Exception as e:
@@ -626,14 +738,14 @@ def ai_semantic_query(req: AIQueryRequest):
 
     # 3. Generate Report using Gemini API
     report = ""
-    api_key = req.gemini_key or os.environ.get("GEMINI_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        report = "### Executive Summary (Demo Mode - Gemini API Key Missing)\\n\\n"
-        report += f"The query fetched **{len(results_list)} records** from the database. Enter your Gemini API Key in the Settings page to generate real-time AI-powered reports."
+        report = "### Executive Summary\n\n"
+        report += f"The query fetched **{len(results_list)} records** from the database. Configure `GEMINI_API_KEY` in your `.env` file to enable AI-powered report generation."
     else:
         try:
             client = genai.Client(api_key=api_key)
-            prompt = f"User Request: {raw_query}\\nExecuted SQL: {sql}\\nTabular Data Results (JSON): {results_list[:50]}"
+            prompt = f"User Request: {raw_query}\nExecuted SQL: {sql}\nTabular Data Results (JSON): {results_list[:50]}"
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
@@ -641,7 +753,10 @@ def ai_semantic_query(req: AIQueryRequest):
             )
             report = response.text.strip()
         except Exception as e:
-            report = f"### Executive Summary\\n\\nError generating report via Gemini: {str(e)}\\n\\nQuery retrieved {len(results_list)} rows successfully."
+            report = f"### Executive Summary\n\nError generating report via Gemini: {str(e)}\n\nQuery retrieved {len(results_list)} rows successfully."
+
+    # Sanitize currency: replace any foreign currency symbols with ₹ regardless of LLM output
+    report = re.sub(r"[$€£¥₩₽¢₫₪₴₦₱₲₵₡₭₮₸₺₼₾₿]", "₹", report)
 
     return {
         "sql": sql,
