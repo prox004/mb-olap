@@ -1,6 +1,7 @@
 # pyrefly: ignore [missing-import]
 import re
 import os
+import logging
 import math
 # pyrefly: ignore [missing-import]
 # pyrefly: ignore [missing-import]
@@ -595,29 +596,59 @@ def get_groq_client(api_key: str):
         base_url=GROQ_BASE_URL,
     )
 
-def generate_groq_text(client, prompt: str, system_prompt: str) -> str:
+logger = logging.getLogger("nl2sql")
+
+def generate_groq_text(client, prompt: str, system_prompt: str, temperature: float = 0.0) -> str:
     response = client.chat.completions.create(
         model=GROQ_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=4096
+        max_tokens=4096,
+        temperature=temperature,   # deterministic SQL gen; report gen can use a slightly higher value if you want variety
+        timeout=20,                # don't let the demo hang if Groq is slow
     )
     content = response.choices[0].message.content or ""
-    # Strip out any <think>...</think> reasoning blocks if present
     content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
     return content
 
+
+def clean_sql(sql_response: str) -> str:
+    """Strip markdown fences / stray prose the model sometimes adds despite instructions."""
+    sql_response = sql_response.strip()
+    if sql_response.startswith("```"):
+        sql_response = re.sub(r"^```sql\s*|^```\s*|```$", "", sql_response, flags=re.MULTILINE).strip()
+    # If the model added a trailing explanation after the query, cut it at the first ';' if present
+    if ";" in sql_response:
+        sql_response = sql_response.split(";")[0].strip()
+    return sql_response
+
+
+# ---------------------------------------------------------------------------
 # System prompt with database schema metadata
+# ---------------------------------------------------------------------------
 SQL_GEN_SYSTEM_PROMPT = """DuckDB SQL expert. Translate natural language to a single read-only SELECT. Output raw SQL only — no markdown, backticks, or prose.
 Rules: SELECT only. Aliases usable in HAVING/ORDER BY, not WHERE. Single quotes for strings, double quotes for identifiers with spaces. Always LIMIT unless user says otherwise.
-Product rule: whenever any product column (DESC1, MRP, RATE, Sales, Profit, etc.) appears in SELECT, always also include p.ICODE as the first product column — it is the barcode/SKU identifier.
+
+Product identity rule (IMPORTANT):
+- Always SELECT p.ICODE as the product identifier whenever any product-level column (MRP, RATE, Sales, Profit, etc.) appears.
+- DO NOT use p.DESC1 to name, filter, group, or search for products — it is blank for ~99% of rows and unreliable. Never put DESC1 in a WHERE clause to "find" a product by name.
+- For any human-readable grouping of products (by "type", "category", "brand", "department", "line", etc.), use the business dimensions instead:
+    cat."Category 1" ... cat."Category 6" (Dim_Category, broad → narrow)
+    org.Division, org.Section, org.Department (Dim_Organization)
+    sup.PARTYNAME (Dim_Supplier)
+  Pick whichever of these best matches the wording of the question (e.g. "by brand" → supplier or Category; "by department" → org.Department).
+
+Ambiguity rule (IMPORTANT):
+- If the question is incomplete or ambiguous (no time range, no explicit metric, vague scope like "best products" or "how are we doing"), do NOT refuse and do NOT ask a clarifying question — make the most reasonable default assumption and still produce a valid, runnable query.
+  Defaults: metric = SUM(NET_SALE_AMOUNT) unless profit/margin is implied; time range = all available data unless a period is mentioned; N = 10 for "top/best/worst" with no number given.
+
 Currency rule: all monetary values are in Indian Rupees. Never use $ or USD. Format amounts with the ₹ symbol in column aliases when helpful (e.g. "Sales_₹").
 
 SCHEMA (join all facts to dims on surrogate _ID keys):
-Dim_Product(Product_ID PK, ICODE varchar/*barcode/SKU — always SELECT this for any product query*/, DESC1 varchar/*product name*/, MRP double/*max retail price ₹*/, RATE double/*cost ₹*/, STOCKINDATE timestamp)
-Dim_Supplier(Supplier_ID PK, PARTYNAME varchar/*vendor name*/)
+Dim_Product(Product_ID PK, ICODE varchar/*barcode/SKU — always SELECT this for any product query*/, DESC1 varchar/*mostly blank, do not rely on this*/, MRP double/*max retail price ₹*/, RATE double/*cost ₹*/, STOCKINDATE timestamp)
+Dim_Supplier(Supplier_ID PK, PARTYNAME varchar/*vendor/brand name*/)
 Dim_Category(Category_ID PK, "Category 1" varchar/*top*/, "Category 2", "Category 3", "Category 4", "Category 5", "Category 6", GRP_REM varchar)  -- always quote spaced cols: cat."Category 1"
 Dim_Organization(Org_ID PK, Division, Section, Department varchar)
 Dim_Store(Store_ID PK, ADMSITE_CODE varchar)
@@ -634,13 +665,15 @@ Fact_Inventory_Sales(Product_ID, Supplier_ID, Category_ID, Org_ID, Store_ID, Dat
 Fact_Financial_Metrics  -- VIEW = Fact_Inventory_Sales + Dim_Product extras. USE THIS for profit/margin/markup/inventory worth queries.
   Extra cols: NET_SALE_QUANTITY, Gross_Profit/*sale-cogs*/, Gross_Margin_Pct, Markup_Pct, Inventory_Cost/*qty*rate*/, Potential_Revenue/*qty*MRP*/, Inventory_Worth, MRP, RATE
 
-Product_ABC_Classification(Product_ID, Cumulative_Revenue, ABC_Class varchar)  -- 'A'|'B'|'C'
-Product_XYZ_Classification(Product_ID, Avg_Qty, Stdev_Qty, CV_Pct, XYZ_Class varchar)  -- 'X'stable|'Y'variable|'Z'erratic
-Product_Stock_Velocity(Product_ID, Avg_STR, Velocity_Class varchar)  -- 'Fast'|'Medium'|'Slow'
+Product_ABC_Classification(Product_ID, Cumulative_Revenue, ABC_Class varchar)  -- 'Class A'|'Class B'|'Class C'
+Product_XYZ_Classification(Product_ID, Avg_Qty, Stdev_Qty, CV_Pct, XYZ_Class varchar)  -- 'Class X'|'Class Y'|'Class Z'
+Product_Stock_Velocity(Product_ID, Avg_STR, Velocity_Class varchar)  -- 'Fast Moving'|'Normal'|'Slow Moving'
+
 
 PATTERNS:
 sales/revenue → SUM(NET_SALE_AMOUNT) | profit → SUM(Gross_Profit) via Fact_Financial_Metrics
 top N → ORDER BY metric DESC LIMIT N | second best → LIMIT 1 OFFSET 1
+"top products" / "best sellers" without a naming column → GROUP BY p.ICODE, cat."Category 1" (do not group by DESC1)
 dead stock → Product_ID NOT IN (SELECT DISTINCT Product_ID FROM Fact_Inventory_Sales WHERE NET_SALE_AMOUNT>0)
 date filter → JOIN Dim_Date d ON f.Date_ID=d.Date_ID WHERE d.Year=2024
 
@@ -653,13 +686,13 @@ Q: second best supplier by sales
 SELECT sup.PARTYNAME, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Supplier sup ON f.Supplier_ID=sup.Supplier_ID GROUP BY sup.PARTYNAME ORDER BY Sales DESC LIMIT 1 OFFSET 1
 
 Q: top 5 products by profit
-SELECT p.ICODE, p.DESC1, SUM(f.Gross_Profit) AS Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Profit DESC LIMIT 5
+SELECT p.ICODE, cat."Category 1", SUM(f.Gross_Profit) AS Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Category cat ON f.Category_ID=cat.Category_ID GROUP BY p.ICODE, cat."Category 1" ORDER BY Profit DESC LIMIT 5
 
 Q: best and worst 5 products by sales
-WITH s AS (SELECT p.DESC1 AS Product, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.DESC1)
-(SELECT 'Best' AS Category, Product, Sales FROM s ORDER BY Sales DESC LIMIT 5)
+WITH s AS (SELECT p.ICODE, cat."Category 1" AS Category, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Category cat ON f.Category_ID=cat.Category_ID GROUP BY p.ICODE, cat."Category 1")
+(SELECT 'Best' AS Rank_Group, ICODE, Category, Sales FROM s ORDER BY Sales DESC LIMIT 5)
 UNION ALL
-(SELECT 'Worst' AS Category, Product, Sales FROM s ORDER BY Sales ASC LIMIT 5)
+(SELECT 'Worst' AS Rank_Group, ICODE, Category, Sales FROM s ORDER BY Sales ASC LIMIT 5)
 """
 
 REPORT_GEN_SYSTEM_PROMPT = """You are a senior Business Intelligence and Inventory Analyst.
@@ -676,8 +709,10 @@ Requirements:
 - Use short sections.
 - Keep the report under 150 words.
 - Base every statement strictly on the supplied data.
+- If the data is empty, say plainly that no matching records were found and suggest the user broaden the filters — do not invent figures.
 - Highlight important figures and rankings.
 - Mention anomalies only if clearly supported.
+- Refer to products by their ICODE and category/department/supplier, never by a blank or missing description field.
 
 Currency Rules (MANDATORY):
 - All monetary values are Indian Rupees.
@@ -689,28 +724,88 @@ Formatting:
 - Use Indian number formatting.
 - Use concise bullet points where appropriate."""
 
+
+# ---------------------------------------------------------------------------
+# Self-healing SQL generation: generate -> validate -> execute -> repair
+# ---------------------------------------------------------------------------
+MAX_SQL_ATTEMPTS = 3  # 1 initial + 2 repair attempts
+
+def generate_and_run_sql(client, raw_query: str):
+    """
+    Returns (sql, results_list, error_or_None).
+    Retries with the execution error fed back to the model if the first
+    attempt produces invalid/failing SQL — this is what keeps advanced or
+    slightly-off-schema questions from just breaking the demo outright.
+    """
+    sql = None
+    last_error = None
+
+    for attempt in range(MAX_SQL_ATTEMPTS):
+        if attempt == 0:
+            prompt = raw_query
+        else:
+            prompt = f"""Your previous SQL failed. Fix it and return ONLY the corrected raw SQL (no prose, no markdown).
+
+Original question: {raw_query}
+Previous SQL: {sql}
+Database error: {last_error}
+"""
+        try:
+            sql_response = generate_groq_text(client, prompt, SQL_GEN_SYSTEM_PROMPT)
+        except Exception as e:
+            last_error = f"Groq call failed: {e}"
+            logger.warning("SQL generation attempt %d failed: %s", attempt, last_error)
+            continue
+
+        candidate_sql = fix_union_order_by(clean_sql(sql_response))
+
+        # Safety check applies ONLY to the generated SQL, never to the user's free-text question
+        if not is_safe_sql(candidate_sql):
+            last_error = "Generated SQL failed the read-only safety check (must be a single SELECT statement)."
+            logger.warning("Attempt %d rejected by safety check: %s", attempt, candidate_sql)
+            sql = candidate_sql
+            continue
+
+        sql = candidate_sql
+        conn = get_db()
+        try:
+            res = conn.execute(sql).fetchall()
+            cols = [desc[0] for desc in conn.description]
+            results_list = [dict(zip(cols, row)) for row in res]
+            return sql, results_list, None
+        except Exception as e:
+            last_error = str(e)
+            logger.warning("Attempt %d execution failed: %s | SQL: %s", attempt, last_error, sql)
+            continue
+        finally:
+            conn.close()
+
+    return sql, [], last_error
+
+
 @app.get("/api/v1/ai/suggestions")
 def get_ai_suggestions():
     """Return all cached query strings for frontend autocomplete."""
     return {"suggestions": sorted(query_cache.keys())}
+
 
 @app.post("/api/v1/ai/query")
 def ai_semantic_query(req: AIQueryRequest):
     raw_query = req.query.strip()
     if not raw_query:
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
-    
-    # 1. Check fuzzy match cache
+
+    # 1. Check fuzzy match cache (only ever populated with SQL that has already
+    #    executed successfully once — see bottom of this function)
     sql = find_cached_query(raw_query)
-    cache_hit = False
-    
-    if sql:
-        cache_hit = True
-    else:
-        # Generate query using Groq's OpenAI-compatible API
+    cache_hit = sql is not None
+    results_list = []
+    exec_error = None
+
+    if not sql:
         api_key = os.environ.get("GROQ_API_KEY")
         if not api_key:
-            # Fallback to standard matching in case API key is not configured yet
+            # Fallback to basic keyword matching if the API key isn't configured
             q = raw_query.lower()
             if "highest profit" in q or "top supplier" in q:
                 sql = query_cache["which supplier generated the highest profit?"]
@@ -720,55 +815,71 @@ def ai_semantic_query(req: AIQueryRequest):
                 sql = query_cache["show inventory values exceeding 20 lakh"]
             else:
                 sql = """
-                SELECT p.ICODE, p.DESC1, SUM(f.NET_SALE_AMOUNT) AS Sales
+                SELECT p.ICODE, SUM(f.NET_SALE_AMOUNT) AS Sales
                 FROM Fact_Financial_Metrics f
                 JOIN Dim_Product p ON f.Product_ID = p.Product_ID
-                GROUP BY p.ICODE, p.DESC1
+                GROUP BY p.ICODE
                 ORDER BY Sales DESC
                 LIMIT 10
                 """
+            conn = get_db()
+            try:
+                res = conn.execute(sql).fetchall()
+                cols = [desc[0] for desc in conn.description]
+                results_list = [dict(zip(cols, row)) for row in res]
+            except Exception as e:
+                conn.close()
+                raise HTTPException(status_code=500, detail=f"SQL Execution Error: {str(e)} (Generated Query: {sql})")
+            finally:
+                conn.close()
         else:
             try:
                 client = get_groq_client(api_key)
-                sql_response = generate_groq_text(client, raw_query, SQL_GEN_SYSTEM_PROMPT)
-                # Clean markdown styling if the model accidentally returned it
-                if sql_response.startswith("```"):
-                    sql_response = re.sub(r"^```sql\s*|^```\s*|```$", "", sql_response, flags=re.MULTILINE).strip()
-                sql = fix_union_order_by(sql_response)
-                # Save to cache
-                query_cache[raw_query.lower()] = sql
+                sql, results_list, exec_error = generate_and_run_sql(client, raw_query)
             except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Groq Qwen: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Groq: {str(e)}")
 
-    # 2. Safety Check
-    if not is_safe_sql(sql) or not is_safe_sql(raw_query):
-        raise HTTPException(status_code=403, detail="Access Violation: Non-SELECT or modification query blocked.")
-        
-    conn = get_db()
-    results_list = []
-    try:
-        res = conn.execute(sql).fetchall()
-        cols = [desc[0] for desc in conn.description]
-        results_list = [dict(zip(cols, row)) for row in res]
-    except Exception as e:
-        conn.close()
-        raise HTTPException(status_code=500, detail=f"SQL Execution Error: {str(e)} (Generated Query: {sql})")
-    finally:
-        conn.close()
+            if exec_error:
+                # Every retry failed — surface a clean error instead of a stack trace,
+                # and do NOT poison the cache with broken SQL.
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Could not produce a working query for this question after {MAX_SQL_ATTEMPTS} attempts. "
+                           f"Last error: {exec_error}"
+                )
 
-    # 3. Generate Report using Groq's OpenAI-compatible API
+            # Only cache SQL that has actually run successfully
+            query_cache[raw_query.lower()] = sql
+    else:
+        # Cache hit — still need to run it
+        if not is_safe_sql(sql):
+            raise HTTPException(status_code=403, detail="Access Violation: cached query is not a safe read-only SELECT.")
+        conn = get_db()
+        try:
+            res = conn.execute(sql).fetchall()
+            cols = [desc[0] for desc in conn.description]
+            results_list = [dict(zip(cols, row)) for row in res]
+        except Exception as e:
+            conn.close()
+            raise HTTPException(status_code=500, detail=f"SQL Execution Error: {str(e)} (Generated Query: {sql})")
+        finally:
+            conn.close()
+
+    # 2. Generate Report
     report = ""
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         report = "### Executive Summary\n\n"
         report += f"The query fetched **{len(results_list)} records** from the database. Configure `GROQ_API_KEY` in your `.env` file to enable AI-powered report generation."
+    elif not results_list:
+        report = "### Executive Summary\n\nNo matching records were found for this query. Try widening the date range or removing a filter."
     else:
         try:
             client = get_groq_client(api_key)
             prompt = f"User Request: {raw_query}\nExecuted SQL: {sql}\nTabular Data Results (JSON): {results_list[:50]}"
-            report = generate_groq_text(client, prompt, REPORT_GEN_SYSTEM_PROMPT)
+            report = generate_groq_text(client, prompt, REPORT_GEN_SYSTEM_PROMPT, temperature=0.3)
         except Exception as e:
-            report = f"### Executive Summary\n\nError generating report via Groq Qwen: {str(e)}\n\nQuery retrieved {len(results_list)} rows successfully."
+            report = f"### Executive Summary\n\nCould not generate the narrative report ({str(e)}), but the query itself succeeded and returned {len(results_list)} row(s) below."
 
     # Sanitize currency: replace any foreign currency symbols with ₹ regardless of LLM output
     report = re.sub(r"[$€£¥₩₽¢₫₪₴₦₱₲₵₡₭₮₸₺₼₾₿]", "₹", report)
