@@ -529,12 +529,39 @@ def demand_forecast(metric: str = "sales", horizon: int = 30):
 GROQ_MODEL = "openai/gpt-oss-120b"
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
-AI_SUGGESTIONS = [
-    "Which supplier generated the highest profit?",
-    "Show products with zero sales.",
-    "Top 5 products by gross margin",
-    "Show slow-moving products with closing stock value",
-]
+FIXED_QUERIES_PATH = os.path.join(os.path.dirname(__file__), "..", "fixed_queries.json")
+
+
+def normalize_question_text(text: str) -> str:
+    return re.sub(r"\s+", " ", text.strip().lower())
+
+
+def load_fixed_queries():
+    try:
+        with open(FIXED_QUERIES_PATH, "r", encoding="utf-8") as f:
+            raw_queries = json.load(f)
+    except Exception as e:
+        logger.warning("Failed to load fixed queries: %s", e)
+        return []
+
+    fixed_queries = []
+    for item in raw_queries:
+        question = item.get("question")
+        sql = item.get("sql")
+        if isinstance(question, str) and isinstance(sql, str) and question.strip() and sql.strip():
+            fixed_queries.append(
+                {
+                    "question": question.strip(),
+                    "normalized_question": normalize_question_text(question),
+                    "sql": sql.strip(),
+                }
+            )
+    return fixed_queries
+
+
+FIXED_QUERIES = load_fixed_queries()
+FIXED_QUERY_MAP = {item["normalized_question"]: item for item in FIXED_QUERIES}
+AI_SUGGESTIONS = [item["question"] for item in FIXED_QUERIES]
 
 FALLBACK_SQL_BY_KEYWORD = {
     "highest_profit_supplier": """
@@ -984,53 +1011,58 @@ def ai_semantic_query(req: AIQueryRequest):
     if not raw_query:
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
+    normalized_query = normalize_question_text(raw_query)
+    fixed_query = FIXED_QUERY_MAP.get(normalized_query)
     sql = None
     results_list = []
     exec_error = None
     zero_result_repair_meta = None
+    fixed_query_hit = False
 
-    api_key = os.environ.get("GROQ_API_KEY")
-    if not api_key:
-        # Fallback to basic keyword matching if the API key isn't configured
-        q = raw_query.lower()
-        if "highest profit" in q or "top supplier" in q:
-            sql = FALLBACK_SQL_BY_KEYWORD["highest_profit_supplier"]
-        elif "zero sales" in q or "no sales" in q:
-            sql = FALLBACK_SQL_BY_KEYWORD["zero_sales_products"]
-        elif "exceeding 20 lakh" in q or "exceeding 20" in q or "20 lakh" in q:
-            sql = FALLBACK_SQL_BY_KEYWORD["inventory_value_over_20_lakh"]
-        else:
-            sql = FALLBACK_SQL_BY_KEYWORD["default_top_products_by_sales"]
-        conn = get_db()
-        try:
-            res = conn.execute(sql).fetchall()
-            cols = [desc[0] for desc in conn.description]
-            results_list = [dict(zip(cols, row)) for row in res]
-        except Exception as e:
-            conn.close()
-            raise HTTPException(status_code=500, detail=f"SQL Execution Error: {str(e)} (Generated Query: {sql})")
-        finally:
-            conn.close()
-    else:
-        try:
-            client = get_groq_client(api_key)
-            sql, results_list, exec_error = generate_and_run_sql(client, raw_query)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Groq: {str(e)}")
-
+    if fixed_query:
+        fixed_query_hit = True
+        logger.info("AI query used fixed SQL path | question=%s", normalized_query)
+        sql = fixed_query["sql"]
+        results_list, exec_error = run_sql(sql)
         if exec_error:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Could not produce a working query for this question after {MAX_SQL_ATTEMPTS} attempts. "
-                       f"Last error: {exec_error}"
-            )
+            raise HTTPException(status_code=500, detail=f"SQL Execution Error: {exec_error} (Fixed Query: {sql})")
+    else:
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+        # Fallback to basic keyword matching if the API key isn't configured
+            q = raw_query.lower()
+            if "highest profit" in q or "top supplier" in q:
+                sql = FALLBACK_SQL_BY_KEYWORD["highest_profit_supplier"]
+            elif "zero sales" in q or "no sales" in q:
+                sql = FALLBACK_SQL_BY_KEYWORD["zero_sales_products"]
+            elif "exceeding 20 lakh" in q or "exceeding 20" in q or "20 lakh" in q:
+                sql = FALLBACK_SQL_BY_KEYWORD["inventory_value_over_20_lakh"]
+            else:
+                sql = FALLBACK_SQL_BY_KEYWORD["default_top_products_by_sales"]
+            results_list, exec_error = run_sql(sql)
+            if exec_error:
+                raise HTTPException(status_code=500, detail=f"SQL Execution Error: {exec_error} (Generated Query: {sql})")
+        else:
+            try:
+                logger.info("AI query used LLM SQL generation path | question=%s", raw_query)
+                client = get_groq_client(api_key)
+                sql, results_list, exec_error = generate_and_run_sql(client, raw_query)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Groq: {str(e)}")
 
-        if not results_list and should_attempt_zero_result_repair(raw_query):
-            repaired_sql, repaired_results, repair_meta = attempt_zero_result_repair(client, raw_query, sql)
-            if repaired_results:
-                sql = repaired_sql
-                results_list = repaired_results
-                zero_result_repair_meta = repair_meta
+            if exec_error:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Could not produce a working query for this question after {MAX_SQL_ATTEMPTS} attempts. "
+                           f"Last error: {exec_error}"
+                )
+
+            if not results_list and should_attempt_zero_result_repair(raw_query):
+                repaired_sql, repaired_results, repair_meta = attempt_zero_result_repair(client, raw_query, sql)
+                if repaired_results:
+                    sql = repaired_sql
+                    results_list = repaired_results
+                    zero_result_repair_meta = repair_meta
 
     # 2. Generate Report
     report = ""
@@ -1051,11 +1083,19 @@ def ai_semantic_query(req: AIQueryRequest):
     # Sanitize currency: replace any foreign currency symbols with ₹ regardless of LLM output
     report = re.sub(r"[$€£¥₩₽¢₫₪₴₦₱₲₵₡₭₮₸₺₼₾₿]", "₹", report)
 
+    logger.info(
+        "AI query completed | fixed_query_hit=%s | zero_result_repair_used=%s | rows=%d",
+        fixed_query_hit,
+        zero_result_repair_meta is not None,
+        len(results_list),
+    )
+
     return {
         "sql": sql,
         "results": results_list,
         "report": report,
         "cache_hit": False,
+        "fixed_query_hit": fixed_query_hit,
         "zero_result_repair_used": zero_result_repair_meta is not None,
     }
 
