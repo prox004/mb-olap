@@ -34,6 +34,8 @@ type DashboardContextType = {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   resetFilters: () => void;
+  theme: "light" | "dark";
+  toggleTheme: () => void;
 };
 
 const defaultFilters: Filters = {
@@ -67,6 +69,25 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(defaultOptions);
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  // Sync theme class with document element
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.className = savedTheme;
+    } else {
+      document.documentElement.className = "dark";
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.className = newTheme;
+  };
 
   // Load filter boundaries from API
   useEffect(() => {
@@ -110,6 +131,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         activeTab,
         setActiveTab,
         resetFilters,
+        theme,
+        toggleTheme,
       }}
     >
       {children}
@@ -124,3 +147,4 @@ export function useDashboard() {
   }
   return context;
 }
+

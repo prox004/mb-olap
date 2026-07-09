@@ -3,13 +3,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDashboard } from "../DashboardContext";
 import * as echarts from "echarts";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, TrendingUp } from "lucide-react";
+import { getChartTheme, CHART_COLORS } from "../../lib/chartUtils";
 
 export default function SalesAnalytics() {
-  const { filters } = useDashboard();
+  const { filters, theme } = useDashboard();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  
+
   const trendRef = useRef<HTMLDivElement | null>(null);
   const rankingRef = useRef<HTMLDivElement | null>(null);
 
@@ -28,13 +29,17 @@ export default function SalesAnalytics() {
         filters.supplier.forEach((val) => queryParams.append("supplier", val));
         filters.store.forEach((val) => queryParams.append("store", val));
         filters.category.forEach((val) => queryParams.append("category", val));
-        
+
         if (filters.startDate) queryParams.append("start_date", filters.startDate);
         if (filters.endDate) queryParams.append("end_date", filters.endDate);
 
-        const res = await fetch(`http://127.0.0.1:8000/api/v1/analytics/sales-charts?${queryParams.toString()}`);
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/v1/analytics/sales-charts?${queryParams.toString()}`
+        );
         if (!res.ok) throw new Error("Failed to fetch chart data");
         const data = await res.json();
+
+        const chartTheme = getChartTheme(theme);
 
         // 1. Render Trend Area Chart
         if (trendRef.current) {
@@ -45,19 +50,25 @@ export default function SalesAnalytics() {
 
           trendChart.setOption({
             backgroundColor: "transparent",
-            tooltip: { trigger: "axis" },
-            legend: { data: ["Sales", "Profit"], textStyle: { color: "#A1A1AA" } },
+            tooltip: {
+              trigger: "axis",
+              ...chartTheme.tooltip,
+            },
+            legend: {
+              data: ["Sales", "Profit"],
+              textStyle: chartTheme.textStyle,
+            },
             grid: { left: "4%", right: "4%", bottom: "3%", containLabel: true },
             xAxis: {
               type: "category",
               data: periods,
-              axisLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
-              axisLabel: { color: "#A1A1AA" },
+              axisLine: chartTheme.axisLine,
+              axisLabel: chartTheme.textStyle,
             },
             yAxis: {
               type: "value",
-              splitLine: { lineStyle: { color: "rgba(255,255,255,0.05)" } },
-              axisLabel: { color: "#A1A1AA" },
+              splitLine: chartTheme.splitLine,
+              axisLabel: chartTheme.textStyle,
             },
             series: [
               {
@@ -67,11 +78,11 @@ export default function SalesAnalytics() {
                 smooth: true,
                 areaStyle: {
                   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: "rgba(37, 99, 235, 0.4)" },
-                    { offset: 1, color: "rgba(37, 99, 235, 0.0)" },
+                    { offset: 0, color: "rgba(223, 28, 36, 0.4)" }, // Brand red glow
+                    { offset: 1, color: "rgba(223, 28, 36, 0.0)" },
                   ]),
                 },
-                itemStyle: { color: "#2563EB" },
+                itemStyle: { color: CHART_COLORS.red },
               },
               {
                 name: "Profit",
@@ -80,11 +91,11 @@ export default function SalesAnalytics() {
                 smooth: true,
                 areaStyle: {
                   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: "rgba(109, 40, 217, 0.4)" },
-                    { offset: 1, color: "rgba(109, 40, 217, 0.0)" },
+                    { offset: 0, color: "rgba(37, 99, 235, 0.3)" }, // Blue glow
+                    { offset: 1, color: "rgba(37, 99, 235, 0.0)" },
                   ]),
                 },
-                itemStyle: { color: "#6D28D9" },
+                itemStyle: { color: CHART_COLORS.blue },
               },
             ],
           });
@@ -98,18 +109,22 @@ export default function SalesAnalytics() {
 
           rankingChart.setOption({
             backgroundColor: "transparent",
-            tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+            tooltip: {
+              trigger: "axis",
+              axisPointer: { type: "shadow" },
+              ...chartTheme.tooltip,
+            },
             grid: { left: "3%", right: "4%", bottom: "3%", containLabel: true },
             xAxis: {
               type: "value",
-              splitLine: { lineStyle: { color: "rgba(255,255,255,0.05)" } },
-              axisLabel: { color: "#A1A1AA" },
+              splitLine: chartTheme.splitLine,
+              axisLabel: chartTheme.textStyle,
             },
             yAxis: {
               type: "category",
               data: suppliers,
-              axisLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
-              axisLabel: { color: "#A1A1AA", fontSize: 10 },
+              axisLine: chartTheme.axisLine,
+              axisLabel: { ...chartTheme.textStyle, fontSize: 9 },
             },
             series: [
               {
@@ -118,8 +133,8 @@ export default function SalesAnalytics() {
                 data: sales,
                 itemStyle: {
                   color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                    { offset: 0, color: "#4338CA" },
-                    { offset: 1, color: "#2563EB" },
+                    { offset: 0, color: CHART_COLORS.purple },
+                    { offset: 1, color: CHART_COLORS.red }, // MBazars red gradient
                   ]),
                   borderRadius: [0, 4, 4, 0],
                 },
@@ -148,22 +163,22 @@ export default function SalesAnalytics() {
       rankingChart?.dispose();
       window.removeEventListener("resize", handleResize);
     };
-  }, [filters]);
+  }, [filters, theme]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Sales Trend Chart */}
       <div className="glass-card p-6 flex flex-col justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-white">Sales & Profit Trend</h3>
-          <p className="text-xs text-[#A1A1AA]">Monthly revenue against Gross Profit bounds</p>
+          <h3 className="text-sm font-semibold text-foreground">Sales & Profit Trend</h3>
+          <p className="text-xs text-muted-foreground">Monthly revenue against Gross Profit bounds</p>
         </div>
         {loading ? (
-          <div className="h-80 bg-[rgba(255,255,255,0.02)] rounded mt-4 animate-pulse"></div>
+          <div className="h-80 bg-muted rounded mt-4 animate-pulse"></div>
         ) : error ? (
           <div className="h-80 flex flex-col items-center justify-center">
-            <ShieldAlert className="h-8 w-8 text-red-500 mb-2" />
-            <span className="text-xs text-[#A1A1AA]">Failed to load visualization data</span>
+            <ShieldAlert className="h-8 w-8 text-primary mb-2" />
+            <span className="text-xs text-muted-foreground">Failed to load visualization data</span>
           </div>
         ) : (
           <div ref={trendRef} className="h-80 w-full mt-4"></div>
@@ -173,15 +188,15 @@ export default function SalesAnalytics() {
       {/* Supplier Performance Chart */}
       <div className="glass-card p-6 flex flex-col justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-white">Top Supplier Performances</h3>
-          <p className="text-xs text-[#A1A1AA]">Rankings based on total Net Sales amount</p>
+          <h3 className="text-sm font-semibold text-foreground">Top Supplier Performances</h3>
+          <p className="text-xs text-muted-foreground">Rankings based on total Net Sales amount</p>
         </div>
         {loading ? (
-          <div className="h-80 bg-[rgba(255,255,255,0.02)] rounded mt-4 animate-pulse"></div>
+          <div className="h-80 bg-muted rounded mt-4 animate-pulse"></div>
         ) : error ? (
           <div className="h-80 flex flex-col items-center justify-center">
-            <ShieldAlert className="h-8 w-8 text-red-500 mb-2" />
-            <span className="text-xs text-[#A1A1AA]">Failed to load visualization data</span>
+            <ShieldAlert className="h-8 w-8 text-primary mb-2" />
+            <span className="text-xs text-muted-foreground">Failed to load visualization data</span>
           </div>
         ) : (
           <div ref={rankingRef} className="h-80 w-full mt-4"></div>

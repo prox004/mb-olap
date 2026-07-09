@@ -587,6 +587,7 @@ def fix_union_order_by(sql: str) -> str:
     return '\n'.join(fixed_parts)
 
 def get_groq_client(api_key: str):
+    # pyrefly: ignore [missing-import]
     from openai import OpenAI
 
     return OpenAI(
@@ -595,15 +596,18 @@ def get_groq_client(api_key: str):
     )
 
 def generate_groq_text(client, prompt: str, system_prompt: str) -> str:
-    response = client.responses.create(
-        input=prompt,
-        instructions=system_prompt,
+    response = client.chat.completions.create(
         model=GROQ_MODEL,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=4096
     )
-    output_text = getattr(response, "output_text", None)
-    if output_text:
-        return output_text.strip()
-    return str(response).strip()
+    content = response.choices[0].message.content or ""
+    # Strip out any <think>...</think> reasoning blocks if present
+    content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+    return content
 
 # System prompt with database schema metadata
 SQL_GEN_SYSTEM_PROMPT = """DuckDB SQL expert. Translate natural language to a single read-only SELECT. Output raw SQL only — no markdown, backticks, or prose.
