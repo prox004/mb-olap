@@ -58,7 +58,7 @@ function makeWelcomeMessage(): Message {
   return {
     id: uid(),
     sender: "bot",
-    text: "Welcome! I'm your **AI Inventory Analyst** powered by Gemini 2.5 Flash.\n\nAsk me anything about sales, supplier performance, product margins, stock velocity, or inventory health — and I'll compile a full executive report.",
+    text: "Welcome! I'm your **AI Inventory Analyst** powered by Qwen 3.6 27B on Groq.\n\nAsk me anything about sales, supplier performance, product margins, stock velocity, or inventory health — and I'll compile a full executive report.",
     ts: Date.now(),
   };
 }
@@ -537,8 +537,8 @@ export default function AIChat() {
             </div>
             <div>
               <h3 className="text-[13px] font-semibold text-white tracking-wide flex items-center gap-2">
-                Gemini OLAP Analyst
-                <span className="text-[9px] bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full text-purple-300 font-normal">gemini-2.5-flash</span>
+                Qwen OLAP Analyst
+                <span className="text-[9px] bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full text-purple-300 font-normal">qwen/qwen3.6-27b</span>
               </h3>
               <p className="text-[10px] text-[#52525B]">Natural language · Read-only · Retail OLAP</p>
             </div>
@@ -645,7 +645,7 @@ export default function AIChat() {
               <Send className="h-3.5 w-3.5" />
             </button>
           </div>
-          <p className="text-[10px] text-[#3F3F46] text-center mt-2">Read-only queries only · Powered by Gemini 2.5 Flash · DuckDB OLAP</p>
+          <p className="text-[10px] text-[#3F3F46] text-center mt-2">Read-only queries only · Powered by Qwen 3.6 27B on Groq · DuckDB OLAP</p>
         </div>
       </div>
     </div>
