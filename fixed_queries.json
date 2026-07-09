@@ -1,0 +1,22 @@
+[
+  {
+    "question": "which are the top selling brands",
+    "sql": "SELECT sup.PARTYNAME AS Brand, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Supplier sup ON f.Supplier_ID = sup.Supplier_ID GROUP BY sup.PARTYNAME ORDER BY Sales DESC LIMIT 10"
+  },
+  {
+    "question": "which are the least selling brands",
+    "sql": "SELECT sup.PARTYNAME AS Brand, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Supplier sup ON f.Supplier_ID = sup.Supplier_ID GROUP BY sup.PARTYNAME HAVING Sales > 0 ORDER BY Sales ASC LIMIT 10"
+  },
+  {
+    "question": "which supplier generated the highest profit",
+    "sql": "SELECT sup.PARTYNAME AS Supplier, SUM(f.Gross_Profit) AS Gross_Profit FROM Fact_Financial_Metrics f JOIN Dim_Supplier sup ON f.Supplier_ID = sup.Supplier_ID GROUP BY sup.PARTYNAME ORDER BY Gross_Profit DESC LIMIT 1"
+  },
+  {
+    "question": "which are the top selling products",
+    "sql": "SELECT p.ICODE, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID = p.Product_ID GROUP BY p.ICODE ORDER BY Sales DESC LIMIT 10"
+  },
+  {
+    "question": "which are the least selling products",
+    "sql": "SELECT p.ICODE, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID = p.Product_ID GROUP BY p.ICODE HAVING Sales > 0 ORDER BY Sales ASC LIMIT 10"
+  }
+]

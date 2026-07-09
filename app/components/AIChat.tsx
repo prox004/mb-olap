@@ -367,7 +367,7 @@ export default function AIChat() {
       setConversations([first]);
       setActiveId(first.id);
     }
-    // Seed suggestions from server cache
+    // Seed fixed-query suggestions from the backend
     fetch("http://127.0.0.1:8000/api/v1/ai/suggestions")
       .then((r) => r.json())
       .then((d) => setSuggestions(d.suggestions || []))
@@ -538,17 +538,13 @@ export default function AIChat() {
     setInput(val);
     e.target.style.height = "auto";
     e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
-    if (val.trim().length < 2) {
+    if (val.trim().length < 1) {
       setShowSuggestions(false);
       setActiveSuggestions([]);
       return;
     }
-    const localQueries = conversations
-      .flatMap((c) => c.messages.filter((m) => m.sender === "user").map((m) => m.text))
-      .filter((q, i, arr) => arr.indexOf(q) === i);
-    const allSuggestions = Array.from(new Set([...localQueries, ...suggestions]));
-    const lower = val.toLowerCase();
-    const filtered = allSuggestions.filter((s) => s.toLowerCase().includes(lower)).slice(0, 8);
+    const lower = val.trim().toLowerCase();
+    const filtered = suggestions.filter((s) => s.toLowerCase().startsWith(lower)).slice(0, 8);
     setActiveSuggestions(filtered);
     setShowSuggestions(filtered.length > 0);
     setSuggestionIdx(-1);
@@ -771,7 +767,7 @@ export default function AIChat() {
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
-                  <Clock className="h-3 w-3 text-primary shrink-0" />
+                  <Database className="h-3 w-3 text-primary shrink-0" />
                   <span className="truncate">{s}</span>
                 </div>
               ))}
@@ -786,7 +782,7 @@ export default function AIChat() {
               onKeyDown={handleKeyDown}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
               onFocus={() =>
-                input.trim().length >= 2 && activeSuggestions.length > 0 && setShowSuggestions(true)
+                input.trim().length >= 1 && activeSuggestions.length > 0 && setShowSuggestions(true)
               }
               placeholder="Ask about sales, suppliers, margins, stock velocity…  (Enter to send, Shift+Enter for newline)"
               disabled={loading}
