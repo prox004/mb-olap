@@ -36,6 +36,20 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 import json
 
+ENTITY_EXTRACTION_SYSTEM_PROMPT = """Extract likely business/entity phrases from the user's retail analytics question.
+
+Return JSON only in this exact shape:
+{"entities":["phrase 1","phrase 2"]}
+
+Rules:
+- Extract only noun-like business/entity phrases that may need database matching.
+- Include supplier names, brand/company names, category phrases, department/section/division phrases, product codes, product-type phrases, and short description-like product references.
+- Do not include metric words like sales, profit, margin, top, bottom, highest, lowest, report, show.
+- Keep phrases short and literal from the user's query.
+- Maximum 5 phrases.
+- If there are no likely entity phrases, return {"entities":[]}.
+"""
+
 def _nan_safe_json(obj):
     """Recursively replace NaN/Inf floats with None so JSON serialization never fails."""
     if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
@@ -512,14 +526,18 @@ def demand_forecast(metric: str = "sales", horizon: int = 30):
         conn.close()
 
 # 6. Read-Only Natural Language AI Gateway & Caching
-import difflib
-
-GROQ_MODEL = "qwen/qwen3.6-27b"
+GROQ_MODEL = "openai/gpt-oss-120b"
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
-# In-memory query cache pre-populated with standard requests
-query_cache = {
-    "which supplier generated the highest profit?": """
+AI_SUGGESTIONS = [
+    "Which supplier generated the highest profit?",
+    "Show products with zero sales.",
+    "Top 5 products by gross margin",
+    "Show slow-moving products with closing stock value",
+]
+
+FALLBACK_SQL_BY_KEYWORD = {
+    "highest_profit_supplier": """
         SELECT sup.PARTYNAME AS Supplier, SUM(f.Gross_Profit) AS Total_Profit
         FROM Fact_Financial_Metrics f
         JOIN Dim_Supplier sup ON f.Supplier_ID = sup.Supplier_ID
@@ -527,36 +545,31 @@ query_cache = {
         ORDER BY Total_Profit DESC
         LIMIT 10
     """,
-    "show products with zero sales.": """
-        SELECT p.ICODE, p.DESC1
+    "zero_sales_products": """
+        SELECT p.ICODE
         FROM Dim_Product p
         WHERE p.Product_ID NOT IN (
             SELECT DISTINCT Product_ID FROM Fact_Inventory_Sales WHERE NET_SALE_AMOUNT > 0
         )
         LIMIT 10
     """,
-    "show inventory values exceeding 20 lakh": """
-        SELECT p.ICODE, p.DESC1, SUM(f.Inventory_Worth) AS Total_Worth
+    "inventory_value_over_20_lakh": """
+        SELECT p.ICODE, SUM(f.Inventory_Worth) AS Total_Worth
         FROM Fact_Financial_Metrics f
         JOIN Dim_Product p ON f.Product_ID = p.Product_ID
-        GROUP BY p.ICODE, p.DESC1
+        GROUP BY p.ICODE
         HAVING Total_Worth > 2000000
         ORDER BY Total_Worth DESC
-    """
+    """,
+    "default_top_products_by_sales": """
+        SELECT p.ICODE, SUM(f.NET_SALE_AMOUNT) AS Sales
+        FROM Fact_Financial_Metrics f
+        JOIN Dim_Product p ON f.Product_ID = p.Product_ID
+        GROUP BY p.ICODE
+        ORDER BY Sales DESC
+        LIMIT 10
+    """,
 }
-
-def find_cached_query(query: str, threshold: float = 0.85) -> Optional[str]:
-    query_clean = query.strip().lower()
-    best_match = None
-    best_ratio = 0.0
-    for cached_q, sql in query_cache.items():
-        ratio = difflib.SequenceMatcher(None, query_clean, cached_q).ratio()
-        if ratio > best_ratio:
-            best_ratio = ratio
-            best_match = sql
-    if best_ratio >= threshold:
-        return best_match
-    return None
 
 def fix_union_order_by(sql: str) -> str:
     """
@@ -631,6 +644,29 @@ def clean_sql(sql_response: str) -> str:
 SQL_GEN_SYSTEM_PROMPT = """DuckDB SQL expert. Translate natural language to a single read-only SELECT. Output raw SQL only — no markdown, backticks, or prose.
 Rules: SELECT only. Aliases usable in HAVING/ORDER BY, not WHERE. Single quotes for strings, double quotes for identifiers with spaces. Always LIMIT unless user says otherwise.
 
+Business glossary and synonym rule (IMPORTANT):
+- vendor = supplier = PARTYNAME = Dim_Supplier
+- brand may mean supplier or category; prefer supplier when the question sounds like a company/vendor, otherwise use the most relevant category level
+- stock value = inventory value = closing inventory value
+- revenue = sales = net sales = SUM(NET_SALE_AMOUNT)
+- COGS = cost of goods sold = NET_SALE_COGS_AMOUNT
+- profit = gross profit = SUM(NET_SALE_AMOUNT - NET_SALE_COGS_AMOUNT) = SUM(Gross_Profit) via Fact_Financial_Metrics
+- margin = gross margin = Gross_Margin_Pct unless the user explicitly asks for markup
+- barcode = SKU = product code = ICODE
+- store = site = store code = ADMSITE_CODE
+
+Metric definition rule (IMPORTANT):
+- sales = SUM(NET_SALE_AMOUNT)
+- gross_profit = SUM(NET_SALE_AMOUNT - NET_SALE_COGS_AMOUNT) or SUM(Gross_Profit) from Fact_Financial_Metrics
+- gross_margin_pct = gross_profit / sales * 100, or use Gross_Margin_Pct from Fact_Financial_Metrics when aggregating appropriately
+- inventory_value = SUM(CLOSING_STOCK_AMOUNT) or SUM(Inventory_Worth) from Fact_Financial_Metrics depending context
+- closing_stock = SUM(CLOSING_STOCK_QUANTITY)
+- opening_stock = SUM(OPENING_QUANTITY)
+- goods_received = SUM(GOODS_RECEIVE_QUANTITY)
+- goods_returned = SUM(GOODS_RETURN_QUANTITY)
+- transfer_in = SUM(SITE_TRANSFER_IN_QUANTITY)
+- transfer_out = SUM(SITE_TRANSFER_OUT_QUANTITY)
+
 Product identity rule (IMPORTANT):
 - Always SELECT p.ICODE as the product identifier whenever any product-level column (MRP, RATE, Sales, Profit, etc.) appears.
 - DO NOT use p.DESC1 to name, filter, group, or search for products — it is blank for ~99% of rows and unreliable. Never put DESC1 in a WHERE clause to "find" a product by name.
@@ -639,6 +675,23 @@ Product identity rule (IMPORTANT):
     org.Division, org.Section, org.Department (Dim_Organization)
     sup.PARTYNAME (Dim_Supplier)
   Pick whichever of these best matches the wording of the question (e.g. "by brand" → supplier or Category; "by department" → org.Department).
+
+Text matching and entity disambiguation rule (IMPORTANT):
+- Natural-language names for suppliers, categories, divisions, sections, and departments are often partial, abbreviated, or missing legal/coded suffixes. Unless the user provides the exact full database value, prefer case-insensitive partial matching with UPPER(column) LIKE '%TERM%' instead of exact equality.
+- For supplier-name questions, filter on sup.PARTYNAME. Do not assume a user-provided business fragment must equal the full PARTYNAME exactly.
+- Tokens embedded inside supplier/category text can look like codes. If an alphanumeric token appears as part of a supplier/business name, treat it as part of the text value unless the user explicitly asks about stores or ADMSITE_CODE.
+- Do not map supplier-name fragments or suffixes to st.ADMSITE_CODE. Only use Dim_Store / ADMSITE_CODE when the user explicitly asks about store/site/store code/site code.
+- If the user gives only a distinctive fragment of a supplier/business name, use a PARTYNAME text filter built from the most distinctive fragment(s), for example UPPER(sup.PARTYNAME) LIKE '%FRAGMENT%'.
+- When names contain punctuation, spaces, or embedded codes, prefer normalized matching such as REGEXP_REPLACE(UPPER(column), '[^A-Z0-9]+', '', 'g') LIKE '%NORMALIZEDTERM%' rather than assuming exact punctuation/spacing.
+
+Data caveats and dataset reality rule (IMPORTANT):
+- PARTYNAME values are messy business strings and may include legal suffixes, punctuation, numeric fragments, and embedded code-like suffixes.
+- DESC1 is usually blank and is not a reliable product name. Prefer ICODE plus supplier/category/department context in both filtering and output.
+- Store identifiers live in Dim_Store.ADMSITE_CODE. Do not infer store filters from arbitrary alphanumeric fragments unless the question is explicitly about stores/sites/store codes.
+- NET_SALE_AMOUNT, NET_SALE_COGS_AMOUNT, stock amounts, MRP, and RATE are monetary/value fields in Indian Rupees.
+- Gross profit can be positive, zero, or negative. Do not assume profit is always positive.
+- Inventory and stock quantities can be zero. Zero-sales and dead-stock style questions are valid and should not be treated as errors.
+- When a question asks for "top products of supplier X", treat it as a supplier filter plus product ranking, usually by sales unless another metric is explicitly named.
 
 Ambiguity rule (IMPORTANT):
 - If the question is incomplete or ambiguous (no time range, no explicit metric, vague scope like "best products" or "how are we doing"), do NOT refuse and do NOT ask a clarifying question — make the most reasonable default assumption and still produce a valid, runnable query.
@@ -687,6 +740,15 @@ SELECT sup.PARTYNAME, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales 
 
 Q: top 5 products by profit
 SELECT p.ICODE, cat."Category 1", SUM(f.Gross_Profit) AS Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Category cat ON f.Category_ID=cat.Category_ID GROUP BY p.ICODE, cat."Category 1" ORDER BY Profit DESC LIMIT 5
+
+Q: top 5 products of a supplier whose name was given partially
+SELECT p.ICODE, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Supplier sup ON f.Supplier_ID=sup.Supplier_ID WHERE UPPER(sup.PARTYNAME) LIKE '%SUPPLIER_FRAGMENT%' GROUP BY p.ICODE ORDER BY Sales DESC LIMIT 5
+
+Q: top products of a supplier whose name was typed without punctuation
+SELECT p.ICODE, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Supplier sup ON f.Supplier_ID=sup.Supplier_ID WHERE REGEXP_REPLACE(UPPER(sup.PARTYNAME), '[^A-Z0-9]+', '', 'g') LIKE '%SUPPLIERNORMALIZED%' GROUP BY p.ICODE ORDER BY Sales DESC LIMIT 10
+
+Q: top suppliers in ladies western wear
+SELECT sup.PARTYNAME, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Supplier sup ON f.Supplier_ID=sup.Supplier_ID JOIN Dim_Organization org ON f.Org_ID=org.Org_ID WHERE UPPER(org.Section) LIKE '%LADIES WESTERN WEAR%' GROUP BY sup.PARTYNAME ORDER BY Sales DESC LIMIT 10
 
 Q: best and worst 5 products by sales
 WITH s AS (SELECT p.ICODE, cat."Category 1" AS Category, SUM(f.NET_SALE_AMOUNT) AS Sales FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Category cat ON f.Category_ID=cat.Category_ID GROUP BY p.ICODE, cat."Category 1")
@@ -783,10 +845,173 @@ Database error: {last_error}
     return sql, [], last_error
 
 
+def normalize_entity_text(text: str) -> str:
+    return re.sub(r"[^A-Z0-9]+", "", text.upper())
+
+
+def should_attempt_zero_result_repair(raw_query: str) -> bool:
+    q = raw_query.lower()
+    explicit_zero_result_cases = [
+        "zero sales",
+        "no sales",
+        "without sales",
+        "dead stock",
+        "not sold",
+        "unsold",
+    ]
+    return not any(phrase in q for phrase in explicit_zero_result_cases)
+
+
+def extract_entities_with_llm(client, raw_query: str) -> List[str]:
+    try:
+        response = generate_groq_text(client, raw_query, ENTITY_EXTRACTION_SYSTEM_PROMPT, temperature=0.0)
+        payload = json.loads(response)
+        entities = payload.get("entities", [])
+        if not isinstance(entities, list):
+            return []
+        cleaned = []
+        for entity in entities:
+            if isinstance(entity, str):
+                entity = entity.strip()
+                if entity:
+                    cleaned.append(entity)
+        return cleaned[:5]
+    except Exception as e:
+        logger.warning("Entity extraction failed: %s", e)
+        return []
+
+
+def search_entity_candidates(entity_phrases: List[str], limit_per_phrase: int = 12) -> List[dict]:
+    if not entity_phrases:
+        return []
+
+    candidates = []
+    seen = set()
+    conn = get_db()
+    try:
+        search_specs = [
+            ("supplier", "Dim_Supplier", "PARTYNAME"),
+            ("category", "Dim_Category", "\"Category 1\""),
+            ("category", "Dim_Category", "\"Category 2\""),
+            ("category", "Dim_Category", "\"Category 3\""),
+            ("category", "Dim_Category", "\"Category 4\""),
+            ("category", "Dim_Category", "\"Category 5\""),
+            ("category", "Dim_Category", "\"Category 6\""),
+            ("division", "Dim_Organization", "Division"),
+            ("section", "Dim_Organization", "Section"),
+            ("department", "Dim_Organization", "Department"),
+            ("product_code", "Dim_Product", "ICODE"),
+            ("product_text", "Dim_Product", "DESC1"),
+        ]
+
+        for phrase in entity_phrases:
+            normalized_phrase = normalize_entity_text(phrase)
+            if len(normalized_phrase) < 2:
+                continue
+            like_value = f"%{normalized_phrase}%"
+
+            for entity_type, table_name, column_name in search_specs:
+                sql = f"""
+                SELECT DISTINCT {column_name} AS candidate
+                FROM {table_name}
+                WHERE {column_name} IS NOT NULL
+                  AND {column_name} <> ''
+                  AND REGEXP_REPLACE(UPPER({column_name}), '[^A-Z0-9]+', '', 'g') LIKE ?
+                LIMIT ?
+                """
+                rows = conn.execute(sql, [like_value, limit_per_phrase]).fetchall()
+                for row in rows:
+                    value = row[0]
+                    key = (entity_type, value)
+                    if not value or key in seen:
+                        continue
+                    seen.add(key)
+                    candidates.append(
+                        {
+                            "query_phrase": phrase,
+                            "entity_type": entity_type,
+                            "value": value,
+                            "normalized_value": normalize_entity_text(str(value)),
+                        }
+                    )
+    finally:
+        conn.close()
+
+    return candidates[:40]
+
+
+def run_sql(sql: str):
+    conn = get_db()
+    try:
+        res = conn.execute(sql).fetchall()
+        cols = [desc[0] for desc in conn.description]
+        return [dict(zip(cols, row)) for row in res], None
+    except Exception as e:
+        return [], str(e)
+    finally:
+        conn.close()
+
+
+def attempt_zero_result_repair(client, raw_query: str, failed_sql: str):
+    entity_phrases = extract_entities_with_llm(client, raw_query)
+    if not entity_phrases:
+        return failed_sql, [], None
+
+    candidates = search_entity_candidates(entity_phrases)
+    if not candidates:
+        return failed_sql, [], None
+
+    repair_prompt = f"""The previous SQL returned zero rows. Repair it and return ONLY corrected raw SQL.
+
+Original question: {raw_query}
+Previous SQL: {failed_sql}
+
+Likely cause:
+- The question contains noun/entity phrases that may not match the database exactly because of punctuation, spaces, abbreviations, legal suffixes, or embedded codes.
+
+Detected entity phrases:
+{json.dumps(entity_phrases, ensure_ascii=False)}
+
+Candidate database matches:
+{json.dumps(candidates, ensure_ascii=False)}
+
+Repair rules:
+- Preserve the user's original metric, ranking direction, and time intent.
+- Fix only the entity matching/filter logic unless another obvious mistake exists.
+- Prefer supplier/category/department/section/division matching over store-code matching unless the question explicitly asks about stores/sites/store codes.
+- For punctuated or abbreviated business names, prefer normalized matching with REGEXP_REPLACE(UPPER(column), '[^A-Z0-9]+', '', 'g').
+- If the question asks for products of a supplier/brand/company, rank products after applying the corrected supplier filter.
+"""
+
+    try:
+        sql_response = generate_groq_text(client, repair_prompt, SQL_GEN_SYSTEM_PROMPT, temperature=0.0)
+        repaired_sql = fix_union_order_by(clean_sql(sql_response))
+    except Exception as e:
+        logger.warning("Zero-result repair generation failed: %s", e)
+        return failed_sql, [], None
+
+    if not is_safe_sql(repaired_sql):
+        logger.warning("Zero-result repair SQL rejected by safety check: %s", repaired_sql)
+        return failed_sql, [], None
+
+    repaired_results, repaired_error = run_sql(repaired_sql)
+    if repaired_error:
+        logger.warning("Zero-result repair SQL failed: %s | SQL: %s", repaired_error, repaired_sql)
+        return failed_sql, [], None
+
+    if not repaired_results:
+        return failed_sql, [], None
+
+    return repaired_sql, repaired_results, {
+        "entity_phrases": entity_phrases,
+        "candidates": candidates,
+    }
+
+
 @app.get("/api/v1/ai/suggestions")
 def get_ai_suggestions():
-    """Return all cached query strings for frontend autocomplete."""
-    return {"suggestions": sorted(query_cache.keys())}
+    """Return static suggestion strings for frontend autocomplete."""
+    return {"suggestions": AI_SUGGESTIONS}
 
 
 @app.post("/api/v1/ai/query")
@@ -795,65 +1020,23 @@ def ai_semantic_query(req: AIQueryRequest):
     if not raw_query:
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
-    # 1. Check fuzzy match cache (only ever populated with SQL that has already
-    #    executed successfully once — see bottom of this function)
-    sql = find_cached_query(raw_query)
-    cache_hit = sql is not None
+    sql = None
     results_list = []
     exec_error = None
+    zero_result_repair_meta = None
 
-    if not sql:
-        api_key = os.environ.get("GROQ_API_KEY")
-        if not api_key:
-            # Fallback to basic keyword matching if the API key isn't configured
-            q = raw_query.lower()
-            if "highest profit" in q or "top supplier" in q:
-                sql = query_cache["which supplier generated the highest profit?"]
-            elif "zero sales" in q or "no sales" in q:
-                sql = query_cache["show products with zero sales."]
-            elif "exceeding 20 lakh" in q or "exceeding 20" in q or "20 lakh" in q:
-                sql = query_cache["show inventory values exceeding 20 lakh"]
-            else:
-                sql = """
-                SELECT p.ICODE, SUM(f.NET_SALE_AMOUNT) AS Sales
-                FROM Fact_Financial_Metrics f
-                JOIN Dim_Product p ON f.Product_ID = p.Product_ID
-                GROUP BY p.ICODE
-                ORDER BY Sales DESC
-                LIMIT 10
-                """
-            conn = get_db()
-            try:
-                res = conn.execute(sql).fetchall()
-                cols = [desc[0] for desc in conn.description]
-                results_list = [dict(zip(cols, row)) for row in res]
-            except Exception as e:
-                conn.close()
-                raise HTTPException(status_code=500, detail=f"SQL Execution Error: {str(e)} (Generated Query: {sql})")
-            finally:
-                conn.close()
+    api_key = os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        # Fallback to basic keyword matching if the API key isn't configured
+        q = raw_query.lower()
+        if "highest profit" in q or "top supplier" in q:
+            sql = FALLBACK_SQL_BY_KEYWORD["highest_profit_supplier"]
+        elif "zero sales" in q or "no sales" in q:
+            sql = FALLBACK_SQL_BY_KEYWORD["zero_sales_products"]
+        elif "exceeding 20 lakh" in q or "exceeding 20" in q or "20 lakh" in q:
+            sql = FALLBACK_SQL_BY_KEYWORD["inventory_value_over_20_lakh"]
         else:
-            try:
-                client = get_groq_client(api_key)
-                sql, results_list, exec_error = generate_and_run_sql(client, raw_query)
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Groq: {str(e)}")
-
-            if exec_error:
-                # Every retry failed — surface a clean error instead of a stack trace,
-                # and do NOT poison the cache with broken SQL.
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Could not produce a working query for this question after {MAX_SQL_ATTEMPTS} attempts. "
-                           f"Last error: {exec_error}"
-                )
-
-            # Only cache SQL that has actually run successfully
-            query_cache[raw_query.lower()] = sql
-    else:
-        # Cache hit — still need to run it
-        if not is_safe_sql(sql):
-            raise HTTPException(status_code=403, detail="Access Violation: cached query is not a safe read-only SELECT.")
+            sql = FALLBACK_SQL_BY_KEYWORD["default_top_products_by_sales"]
         conn = get_db()
         try:
             res = conn.execute(sql).fetchall()
@@ -864,6 +1047,26 @@ def ai_semantic_query(req: AIQueryRequest):
             raise HTTPException(status_code=500, detail=f"SQL Execution Error: {str(e)} (Generated Query: {sql})")
         finally:
             conn.close()
+    else:
+        try:
+            client = get_groq_client(api_key)
+            sql, results_list, exec_error = generate_and_run_sql(client, raw_query)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Groq: {str(e)}")
+
+        if exec_error:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Could not produce a working query for this question after {MAX_SQL_ATTEMPTS} attempts. "
+                       f"Last error: {exec_error}"
+            )
+
+        if not results_list and should_attempt_zero_result_repair(raw_query):
+            repaired_sql, repaired_results, repair_meta = attempt_zero_result_repair(client, raw_query, sql)
+            if repaired_results:
+                sql = repaired_sql
+                results_list = repaired_results
+                zero_result_repair_meta = repair_meta
 
     # 2. Generate Report
     report = ""
@@ -888,7 +1091,8 @@ def ai_semantic_query(req: AIQueryRequest):
         "sql": sql,
         "results": results_list,
         "report": report,
-        "cache_hit": cache_hit
+        "cache_hit": False,
+        "zero_result_repair_used": zero_result_repair_meta is not None,
     }
 
 # 7. Data Exports
