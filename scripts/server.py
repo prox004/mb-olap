@@ -512,7 +512,9 @@ def demand_forecast(metric: str = "sales", horizon: int = 30):
 
 # 6. Read-Only Natural Language AI Gateway & Caching
 import difflib
-from google import genai
+
+GROQ_MODEL = "qwen/qwen3.6-27b"
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 # In-memory query cache pre-populated with standard requests
 query_cache = {
@@ -559,7 +561,7 @@ def fix_union_order_by(sql: str) -> str:
     """
     DuckDB requires every UNION / UNION ALL branch that contains ORDER BY or LIMIT
     to be wrapped in parentheses. This function detects the pattern and fixes it
-    automatically so Gemini-generated queries don't fail at execution time.
+    automatically so AI-generated queries don't fail at execution time.
     """
     union_pattern = re.compile(
         r'(?i)(UNION\s+ALL|UNION)\s+(SELECT)',
@@ -583,6 +585,25 @@ def fix_union_order_by(sql: str) -> str:
             branch = f"({branch})"
         fixed_parts.append(branch)
     return '\n'.join(fixed_parts)
+
+def get_groq_client(api_key: str):
+    from openai import OpenAI
+
+    return OpenAI(
+        api_key=api_key,
+        base_url=GROQ_BASE_URL,
+    )
+
+def generate_groq_text(client, prompt: str, system_prompt: str) -> str:
+    response = client.responses.create(
+        input=prompt,
+        instructions=system_prompt,
+        model=GROQ_MODEL,
+    )
+    output_text = getattr(response, "output_text", None)
+    if output_text:
+        return output_text.strip()
+    return str(response).strip()
 
 # System prompt with database schema metadata
 SQL_GEN_SYSTEM_PROMPT = """DuckDB SQL expert. Translate natural language to a single read-only SELECT. Output raw SQL only — no markdown, backticks, or prose.
@@ -682,8 +703,8 @@ def ai_semantic_query(req: AIQueryRequest):
     if sql:
         cache_hit = True
     else:
-        # Generate query using Gemini API
-        api_key = os.environ.get("GEMINI_API_KEY")
+        # Generate query using Groq's OpenAI-compatible API
+        api_key = os.environ.get("GROQ_API_KEY")
         if not api_key:
             # Fallback to standard matching in case API key is not configured yet
             q = raw_query.lower()
@@ -704,21 +725,16 @@ def ai_semantic_query(req: AIQueryRequest):
                 """
         else:
             try:
-                client = genai.Client(api_key=api_key)
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash-lite',
-                    contents=raw_query,
-                    config={"system_instruction": SQL_GEN_SYSTEM_PROMPT}
-                )
-                sql_response = response.text.strip()
-                # Clean markdown styling if Gemini accidentally returned it
+                client = get_groq_client(api_key)
+                sql_response = generate_groq_text(client, raw_query, SQL_GEN_SYSTEM_PROMPT)
+                # Clean markdown styling if the model accidentally returned it
                 if sql_response.startswith("```"):
                     sql_response = re.sub(r"^```sql\s*|^```\s*|```$", "", sql_response, flags=re.MULTILINE).strip()
                 sql = fix_union_order_by(sql_response)
                 # Save to cache
                 query_cache[raw_query.lower()] = sql
             except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Gemini: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Failed to generate SQL from Groq Qwen: {str(e)}")
 
     # 2. Safety Check
     if not is_safe_sql(sql) or not is_safe_sql(raw_query):
@@ -736,24 +752,19 @@ def ai_semantic_query(req: AIQueryRequest):
     finally:
         conn.close()
 
-    # 3. Generate Report using Gemini API
+    # 3. Generate Report using Groq's OpenAI-compatible API
     report = ""
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         report = "### Executive Summary\n\n"
-        report += f"The query fetched **{len(results_list)} records** from the database. Configure `GEMINI_API_KEY` in your `.env` file to enable AI-powered report generation."
+        report += f"The query fetched **{len(results_list)} records** from the database. Configure `GROQ_API_KEY` in your `.env` file to enable AI-powered report generation."
     else:
         try:
-            client = genai.Client(api_key=api_key)
+            client = get_groq_client(api_key)
             prompt = f"User Request: {raw_query}\nExecuted SQL: {sql}\nTabular Data Results (JSON): {results_list[:50]}"
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt,
-                config={"system_instruction": REPORT_GEN_SYSTEM_PROMPT}
-            )
-            report = response.text.strip()
+            report = generate_groq_text(client, prompt, REPORT_GEN_SYSTEM_PROMPT)
         except Exception as e:
-            report = f"### Executive Summary\n\nError generating report via Gemini: {str(e)}\n\nQuery retrieved {len(results_list)} rows successfully."
+            report = f"### Executive Summary\n\nError generating report via Groq Qwen: {str(e)}\n\nQuery retrieved {len(results_list)} rows successfully."
 
     # Sanitize currency: replace any foreign currency symbols with ₹ regardless of LLM output
     report = re.sub(r"[$€£¥₩₽¢₫₪₴₦₱₲₵₡₭₮₸₺₼₾₿]", "₹", report)
