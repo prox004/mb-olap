@@ -133,7 +133,7 @@ export default function DepartmentInsights() {
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2.5">
           Fuzzy Department Registry Lookup
         </h3>
-        <div className="relative max-w-lg">
+        <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
@@ -162,7 +162,7 @@ export default function DepartmentInsights() {
                       setSelectedDept(item);
                       setSearchQuery("");
                     }}
-                    className="w-full text-left text-xs p-2.5 hover:bg-primary/10 hover:text-primary border-b border-border font-mono transition-colors cursor-pointer text-foreground block bg-card"
+                    className="xfull text-left text-xs p-2.5 hover:bg-primary/10 hover:text-primary border-b border-border font-mono transition-colors cursor-pointer text-foreground block bg-card"
                   >
                     {item.department} (Sales: {formatCurrency(item.sales)})
                   </button>

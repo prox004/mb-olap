@@ -59,8 +59,9 @@ export default function ProductInsights() {
         <p className="text-xs text-muted-foreground">Fuzzy matching lookup against indexed product columns</p>
       </div>
 
-      <div className="relative mt-4 max-w-lg">
+      <div className="relative mt-4 w-full">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+
         <input
           type="text"
           value={q}
@@ -68,6 +69,7 @@ export default function ProductInsights() {
           placeholder="Search by product ICODE or name description..."
           className="w-full h-10 bg-secondary/30 hover:bg-secondary/50 focus:bg-background border border-border focus:border-primary rounded-xl pl-10 pr-10 text-xs text-foreground placeholder:text-muted-foreground outline-none transition-all duration-200 shadow-sm focus:ring-2 focus:ring-primary/10"
         />
+
         {q && (
           <button
             onClick={() => setQ("")}
