@@ -92,8 +92,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
                   <TrendingUp className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <span className="font-bold text-base tracking-tight text-foreground">
-                  MB <span className="text-primary font-black">OLAP</span>
+                <span className="font-bold text-lg text-foreground">
+                  Metro <span className="text-red-500">Bot</span>
                 </span>
               </div>
               <button
