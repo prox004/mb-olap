@@ -3,594 +3,984 @@
         "prompt_id": 1,
         "template_id": "SALES_001",
         "question": "Which is the best-selling product?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 2,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in ACCESSORIES 1?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='ACCESSORIES 1'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='ACCESSORIES 1' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 3,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in ACCESSORIES 2?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='ACCESSORIES 2'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='ACCESSORIES 2' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 4,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in FABRICS & ACCESSORIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='FABRICS & ACCESSORIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='FABRICS & ACCESSORIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 5,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in KIDS WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='KIDS WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='KIDS WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 6,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in LADIES WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='LADIES WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='LADIES WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 7,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in MENS WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='MENS WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='MENS WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 8,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in NON TRADING DIVISION?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='NON TRADING DIVISION'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='NON TRADING DIVISION' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 9,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in SALES PROMOTIONAL ITEMS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='SALES PROMOTIONAL ITEMS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='SALES PROMOTIONAL ITEMS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 10,
         "template_id": "SALES_001_DIVISION",
         "question": "Which is the best-selling product in WINTER GARMENTS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Division='WINTER GARMENTS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='WINTER GARMENTS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 11,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in AD GIFT ITEMS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='AD GIFT ITEMS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='AD GIFT ITEMS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 12,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in BOYS WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='BOYS WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='BOYS WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 13,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in CARRY BAGS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='CARRY BAGS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='CARRY BAGS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 14,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in COSMETICS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='COSMETICS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='COSMETICS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 15,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in CROCKERIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='CROCKERIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='CROCKERIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 16,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in ELECTRICAL EQUIPMENT & FITTINGS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='ELECTRICAL EQUIPMENT & FITTINGS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='ELECTRICAL EQUIPMENT & FITTINGS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 17,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in FABRICS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='FABRICS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='FABRICS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 18,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in FOOTWEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='FOOTWEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='FOOTWEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 19,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in GIRLS WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='GIRLS WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='GIRLS WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 20,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in HOME APPLIANCES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='HOME APPLIANCES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='HOME APPLIANCES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 21,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in HOME FURNISHINGS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='HOME FURNISHINGS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='HOME FURNISHINGS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 22,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in JEWELLERY?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='JEWELLERY'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='JEWELLERY' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 23,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in KIDS ACCESSORIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='KIDS ACCESSORIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='KIDS ACCESSORIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 24,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in LADIES ACCESSORIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='LADIES ACCESSORIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='LADIES ACCESSORIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 25,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in LADIES ETHNIC?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='LADIES ETHNIC'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='LADIES ETHNIC' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 26,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in LADIES WESTERN WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='LADIES WESTERN WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='LADIES WESTERN WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 27,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in LUGGAGE POUCHES & LEATHER ITEMS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='LUGGAGE POUCHES & LEATHER ITEMS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='LUGGAGE POUCHES & LEATHER ITEMS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 28,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in MENS ACCESSORIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='MENS ACCESSORIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='MENS ACCESSORIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 29,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in MENS LOWERS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='MENS LOWERS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='MENS LOWERS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 30,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in MENS SPORTS WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='MENS SPORTS WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='MENS SPORTS WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 31,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in MENS UPPER WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='MENS UPPER WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='MENS UPPER WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 32,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in MISC. MENS WEAR?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='MISC. MENS WEAR'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='MISC. MENS WEAR' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 33,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in OTHER NON TRADING ITEMS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='OTHER NON TRADING ITEMS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='OTHER NON TRADING ITEMS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 34,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in PACKING & DISPLAY MATERIALS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='PACKING & DISPLAY MATERIALS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='PACKING & DISPLAY MATERIALS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 35,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in PLASTIC WARE?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='PLASTIC WARE'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='PLASTIC WARE' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 36,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in SAREES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='SAREES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='SAREES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 37,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in STAFF UNIFORMS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='STAFF UNIFORMS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='STAFF UNIFORMS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 38,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in STATIONERIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='STATIONERIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='STATIONERIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 39,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in TOILETORIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='TOILETORIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='TOILETORIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 40,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in TOYS & GAMES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='TOYS & GAMES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='TOYS & GAMES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 41,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in WINTERWEAR BOYS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='WINTERWEAR BOYS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='WINTERWEAR BOYS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 42,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in WINTERWEAR GIRLS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='WINTERWEAR GIRLS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='WINTERWEAR GIRLS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 43,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in WINTERWEAR LADIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='WINTERWEAR LADIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='WINTERWEAR LADIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 44,
         "template_id": "SALES_001_SECTION",
         "question": "Which is the best-selling product in WINTERWEAR MENS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Section='WINTERWEAR MENS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='WINTERWEAR MENS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 45,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in OTHER ELECTRIC ACCESSORIES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='OTHER ELECTRIC ACCESSORIES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='OTHER ELECTRIC ACCESSORIES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 46,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in BLAZERS (B)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='BLAZERS (B)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='BLAZERS (B)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 47,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SKIRTS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SKIRTS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SKIRTS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 48,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in ELECTRIC KETTLE?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='ELECTRIC KETTLE'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='ELECTRIC KETTLE' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 49,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in BRA?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='BRA'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='BRA' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 50,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SKIRT-TOPS (G)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SKIRT-TOPS (G)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SKIRT-TOPS (G)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 51,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in TEXTILE THAN?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='TEXTILE THAN'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='TEXTILE THAN' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 52,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in PAYJAMA (G)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='PAYJAMA (G)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='PAYJAMA (G)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 53,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in JACKETS [WL]?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='JACKETS [WL]'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='JACKETS [WL]' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 54,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in STAFF JACKETS UF?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='STAFF JACKETS UF'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='STAFF JACKETS UF' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 55,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SHORT PANT?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SHORT PANT'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SHORT PANT' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 56,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in LEGGINGS (G)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='LEGGINGS (G)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='LEGGINGS (G)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 57,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in POLY BAGS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='POLY BAGS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='POLY BAGS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 58,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in PENCILS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='PENCILS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='PENCILS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 59,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in GIRLS SETS [WG]?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='GIRLS SETS [WG]'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='GIRLS SETS [WG]' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 60,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in CURTAIN & COVER?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='CURTAIN & COVER'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='CURTAIN & COVER' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 61,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in T SHIRTS (G)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='T SHIRTS (G)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='T SHIRTS (G)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 62,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in BODY SPRAY?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='BODY SPRAY'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='BODY SPRAY' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 63,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in TROUSERS (B)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='TROUSERS (B)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='TROUSERS (B)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 64,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SOFT TOYS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SOFT TOYS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SOFT TOYS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 65,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SHOES (L)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SHOES (L)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SHOES (L)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 66,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in JACKETS [WB]?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='JACKETS [WB]'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='JACKETS [WB]' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 67,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in PARALLEL (G)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='PARALLEL (G)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='PARALLEL (G)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 68,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in STAFF SHIRTS UF?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='STAFF SHIRTS UF'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='STAFF SHIRTS UF' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 69,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SANDALS (M)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SANDALS (M)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SANDALS (M)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 70,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in COTTON SAREES?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='COTTON SAREES'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='COTTON SAREES' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 71,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in HALF PANT (B)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='HALF PANT (B)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='HALF PANT (B)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 72,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in TUBELIGHT & LED LIGHTS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='TUBELIGHT & LED LIGHTS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='TUBELIGHT & LED LIGHTS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 73,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in ROOM FRESHNERS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='ROOM FRESHNERS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='ROOM FRESHNERS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 74,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in FROCKS (G)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='FROCKS (G)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='FROCKS (G)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 75,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in BLANKETS KIDS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='BLANKETS KIDS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='BLANKETS KIDS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 76,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SHORT KURTI?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SHORT KURTI'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SHORT KURTI' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 77,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in AD REGULAR GIFT ITEMS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='AD REGULAR GIFT ITEMS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='AD REGULAR GIFT ITEMS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 78,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in MASK?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='MASK'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='MASK' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 79,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SPORTS TOYS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SPORTS TOYS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SPORTS TOYS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 80,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SHORT KURTA?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SHORT KURTA'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SHORT KURTA' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 81,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in CAPRI?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='CAPRI'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='CAPRI' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 82,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in FORMAL SHIRTS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='FORMAL SHIRTS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='FORMAL SHIRTS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 83,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in BABA SUITS [WB]?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='BABA SUITS [WB]'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='BABA SUITS [WB]' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 84,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in KURTA PAYJAMA (B)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='KURTA PAYJAMA (B)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='KURTA PAYJAMA (B)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 85,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in T SHIRTS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='T SHIRTS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='T SHIRTS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 86,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in STOCKING?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='STOCKING'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='STOCKING' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 87,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in WINTER TOPS [WL]?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='WINTER TOPS [WL]'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='WINTER TOPS [WL]' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 88,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SOAPS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SOAPS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SOAPS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 89,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in MODI & WAIST COAT?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='MODI & WAIST COAT'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='MODI & WAIST COAT' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 90,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in T SHIRTS (B)?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='T SHIRTS (B)'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='T SHIRTS (B)' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 91,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in PAYJAMA [WB]?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='PAYJAMA [WB]'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='PAYJAMA [WB]' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 92,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in WALKING STICK?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='WALKING STICK'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='WALKING STICK' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 93,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in BEDSHEETS?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='BEDSHEETS'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='BEDSHEETS' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 94,
         "template_id": "SALES_001_DEPARTMENT",
         "question": "Which is the best-selling product in SHAWL?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nWHERE o.Department='SHAWL'\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='SHAWL' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 95,
         "template_id": "SALES_002",
         "question": "Show top 10 best-selling products.",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 10;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 10;"
     },
     {
         "prompt_id": 96,
         "template_id": "SALES_003",
         "question": "Which product generated the highest revenue?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nGROUP BY p.ICODE,p.DESC1\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 97,
         "template_id": "SALES_004",
         "question": "Which product sold maximum quantity?",
-        "sql": "SELECT\n    p.ICODE,\n    p.DESC1,\n    SUM(f.NET_SALE_QUANTITY) Qty\nFROM Fact_Financial_Metrics f\nJOIN Dim_Product p ON f.Product_ID=p.Product_ID\nGROUP BY p.ICODE,p.DESC1\nORDER BY Qty DESC\nLIMIT 1;"
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) AS Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
     },
     {
         "prompt_id": 98,
         "template_id": "SALES_005",
         "question": "Which department sells the most?",
-        "sql": "SELECT\n    o.Department,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Organization o ON f.Org_ID=o.Org_ID\nGROUP BY o.Department\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT o.Department,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON f.Org_ID=o.Org_ID GROUP BY o.Department ORDER BY Revenue DESC LIMIT 1;"
     },
     {
         "prompt_id": 99,
         "template_id": "SALES_006",
         "question": "Which supplier sells the most?",
-        "sql": "SELECT\n    s.PARTYNAME,\n    SUM(f.NET_SALE_AMOUNT) Revenue\nFROM Fact_Financial_Metrics f\nJOIN Dim_Supplier s ON f.Supplier_ID=s.Supplier_ID\nGROUP BY s.PARTYNAME\nORDER BY Revenue DESC\nLIMIT 1;"
+        "sql": "SELECT s.PARTYNAME,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON f.Supplier_ID=s.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Revenue DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 100,
+        "template_id": "SALES_020",
+        "question": "Which new arrival is selling the fastest?",
+        "sql": "SELECT p.ICODE,p.DESC1,p.STOCKINDATE,SUM(f.NET_SALE_QUANTITY) AS Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID WHERE p.STOCKINDATE>=CURRENT_DATE-INTERVAL 30 DAY GROUP BY p.ICODE,p.DESC1,p.STOCKINDATE ORDER BY Qty DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 101,
+        "template_id": "TOP_021",
+        "question": "Show top 10 products.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 10;"
+    },
+    {
+        "prompt_id": 102,
+        "template_id": "TOP_022",
+        "question": "Show top 20 selling products.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 20;"
+    },
+    {
+        "prompt_id": 103,
+        "template_id": "TOP_025",
+        "question": "Which products haven't sold this month?",
+        "sql": "SELECT p.ICODE,p.DESC1 FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0;"
+    },
+    {
+        "prompt_id": 104,
+        "template_id": "TOP_027",
+        "question": "Which products are slow moving?",
+        "sql": "SELECT p.ICODE,p.DESC1,v.Avg_STR,v.Velocity_Class FROM Product_Stock_Velocity v JOIN Dim_Product p ON v.Product_ID=p.Product_ID WHERE v.Velocity_Class='Slow' ORDER BY v.Avg_STR;"
+    },
+    {
+        "prompt_id": 105,
+        "template_id": "TOP_028",
+        "question": "Which products are fast moving?",
+        "sql": "SELECT p.ICODE,p.DESC1,v.Avg_STR,v.Velocity_Class FROM Product_Stock_Velocity v JOIN Dim_Product p ON v.Product_ID=p.Product_ID WHERE v.Velocity_Class='Fast' ORDER BY v.Avg_STR DESC;"
+    },
+    {
+        "prompt_id": 106,
+        "template_id": "TOP_030",
+        "question": "Which products need immediate restocking?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10 ORDER BY Stock;"
+    },
+    {
+        "prompt_id": 107,
+        "template_id": "INV_051",
+        "question": "What is the current inventory value?",
+        "sql": "SELECT SUM(CLOSING_STOCK_AMOUNT) AS Inventory_Value FROM Fact_Inventory_Sales;"
+    },
+    {
+        "prompt_id": 108,
+        "template_id": "INV_052",
+        "question": "How many products are currently in stock?",
+        "sql": "SELECT SUM(CLOSING_STOCK_QUANTITY) AS Total_Stock FROM Fact_Inventory_Sales;"
+    },
+    {
+        "prompt_id": 109,
+        "template_id": "INV_053",
+        "question": "How many unique products are available?",
+        "sql": "SELECT COUNT(DISTINCT Product_ID) AS Total_Products FROM Fact_Inventory_Sales;"
+    },
+    {
+        "prompt_id": 110,
+        "template_id": "INV_054",
+        "question": "Which items are below minimum stock?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<5;"
+    },
+    {
+        "prompt_id": 111,
+        "template_id": "INV_055",
+        "question": "Which items are out of stock?",
+        "sql": "SELECT p.ICODE,p.DESC1 FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)=0;"
+    },
+    {
+        "prompt_id": 112,
+        "template_id": "INV_056",
+        "question": "Which items have excess stock?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)>100;"
+    },
+    {
+        "prompt_id": 113,
+        "template_id": "INV_057",
+        "question": "Which items need replenishment?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10;"
+    },
+    {
+        "prompt_id": 114,
+        "template_id": "INV_059",
+        "question": "Which inventory is dead stock?",
+        "sql": "SELECT p.ICODE,p.DESC1 FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0;"
+    },
+    {
+        "prompt_id": 115,
+        "template_id": "MOVE_063",
+        "question": "Which product moved the fastest this month?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 116,
+        "template_id": "MOVE_064",
+        "question": "Which product is not moving?",
+        "sql": "SELECT p.ICODE,p.DESC1 FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0;"
+    },
+    {
+        "prompt_id": 117,
+        "template_id": "MOVE_066",
+        "question": "Show incoming stock.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.GOODS_RECEIVE_QUANTITY) AS Received FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Received DESC;"
+    },
+    {
+        "prompt_id": 118,
+        "template_id": "MOVE_067",
+        "question": "Show outgoing stock.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) AS Sold FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Sold DESC;"
+    },
+    {
+        "prompt_id": 119,
+        "template_id": "MOVE_070",
+        "question": "Which stock needs adjustment?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.ADJUSTMENT_QUANTITY) Adjustment FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.ADJUSTMENT_QUANTITY)<>0;"
+    },
+    {
+        "prompt_id": 120,
+        "template_id": "PUR_071",
+        "question": "Which supplier provides the best-selling products?",
+        "sql": "SELECT s.PARTYNAME,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Revenue DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 121,
+        "template_id": "PUR_073",
+        "question": "Which supplier supplies the highest quantity?",
+        "sql": "SELECT s.PARTYNAME,SUM(f.GOODS_RECEIVE_QUANTITY) Qty FROM Fact_Inventory_Sales f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Qty DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 122,
+        "template_id": "PUR_074",
+        "question": "Which supplier's products sell the fastest?",
+        "sql": "SELECT s.PARTYNAME,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Qty DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 123,
+        "template_id": "PUR_075",
+        "question": "Which supplier has the lowest sales?",
+        "sql": "SELECT s.PARTYNAME,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Revenue ASC LIMIT 1;"
+    },
+    {
+        "prompt_id": 124,
+        "template_id": "PUR_076",
+        "question": "Which supplier should we reorder from?",
+        "sql": "SELECT s.PARTYNAME,SUM(f.GOODS_RECEIVE_QUANTITY) Received,SUM(f.NET_SALE_QUANTITY) Sold,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10 ORDER BY Sold DESC;"
+    },
+    {
+        "prompt_id": 125,
+        "template_id": "PUR_079",
+        "question": "Which supplier has the best stock turnover?",
+        "sql": "SELECT s.PARTYNAME,SUM(f.NET_SALE_QUANTITY)/NULLIF(AVG(f.Inventory_Cost),0) AS Turnover FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Turnover DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 126,
+        "template_id": "PROFIT_081",
+        "question": "Which product gives the highest profit?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Profit DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 127,
+        "template_id": "PROFIT_082",
+        "question": "Which product gives the lowest profit?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Profit ASC LIMIT 1;"
+    },
+    {
+        "prompt_id": 128,
+        "template_id": "PROFIT_083",
+        "question": "Which department is most profitable?",
+        "sql": "SELECT o.Department,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Profit DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 129,
+        "template_id": "PROFIT_084",
+        "question": "Which supplier is most profitable?",
+        "sql": "SELECT s.PARTYNAME,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Profit DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 130,
+        "template_id": "PROFIT_085",
+        "question": "Which product has the highest margin?",
+        "sql": "SELECT p.ICODE,p.DESC1,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Margin DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 131,
+        "template_id": "PROFIT_086",
+        "question": "Which product has the lowest margin?",
+        "sql": "SELECT p.ICODE,p.DESC1,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Margin ASC LIMIT 1;"
+    },
+    {
+        "prompt_id": 132,
+        "template_id": "PROFIT_087",
+        "question": "Which products should be promoted?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING AVG(f.Gross_Margin_Pct)>20 ORDER BY Profit DESC;"
+    },
+    {
+        "prompt_id": 133,
+        "template_id": "PROFIT_088",
+        "question": "Which products are losing money?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.Gross_Profit)<0 ORDER BY Profit;"
+    },
+    {
+        "prompt_id": 134,
+        "template_id": "PROFIT_089",
+        "question": "Which products have high sales but low profit?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_AMOUNT)>50000 AND SUM(f.Gross_Profit)<1000;"
+    },
+    {
+        "prompt_id": 135,
+        "template_id": "PROFIT_090",
+        "question": "Which products have low sales but high margins?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_AMOUNT)<10000 AND AVG(f.Gross_Margin_Pct)>50;"
+    },
+    {
+        "prompt_id": 136,
+        "template_id": "CUSTOMER_091",
+        "question": "What do customers buy the most?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 137,
+        "template_id": "TIME_104",
+        "question": "What sold the most this month?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 138,
+        "template_id": "TIME_107",
+        "question": "Which day has the highest sales?",
+        "sql": "SELECT d.Date,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Date d ON d.Date_ID=f.Date_ID GROUP BY d.Date ORDER BY Revenue DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 139,
+        "template_id": "ALERT_111",
+        "question": "Which items are about to be out of stock?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10;"
+    },
+    {
+        "prompt_id": 140,
+        "template_id": "ALERT_112",
+        "question": "Which products need urgent replenishment?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10;"
+    },
+    {
+        "prompt_id": 141,
+        "template_id": "ALERT_113",
+        "question": "Which products have zero inventory?",
+        "sql": "SELECT p.ICODE,p.DESC1 FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)=0;"
+    },
+    {
+        "prompt_id": 142,
+        "template_id": "ALERT_114",
+        "question": "Which products have negative stock?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<0;"
+    },
+    {
+        "prompt_id": 143,
+        "template_id": "ALERT_115",
+        "question": "Which products have inventory mismatch?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock,SUM(f.CLOSING_TRANSIT_QUANTITY) Transit FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<>SUM(f.CLOSING_TRANSIT_QUANTITY);"
+    },
+    {
+        "prompt_id": 144,
+        "template_id": "ALERT_116",
+        "question": "Which products need stock verification?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.ADJUSTMENT_QUANTITY) Adjustment FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.ADJUSTMENT_QUANTITY)<>0;"
+    },
+    {
+        "prompt_id": 145,
+        "template_id": "ALERT_117",
+        "question": "Which products are overstocked?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)>100;"
+    },
+    {
+        "prompt_id": 146,
+        "template_id": "ALERT_118",
+        "question": "Which products are understocked?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10;"
+    },
+    {
+        "prompt_id": 147,
+        "template_id": "ALERT_120",
+        "question": "Which products should be discontinued?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0 AND SUM(f.CLOSING_STOCK_QUANTITY)>10;"
+    },
+    {
+        "prompt_id": 148,
+        "template_id": "BI_124",
+        "question": "Which department contributes the highest revenue?",
+        "sql": "SELECT o.Department,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Revenue DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 149,
+        "template_id": "BI_125",
+        "question": "Which department contributes the highest profit?",
+        "sql": "SELECT o.Department,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Profit DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 150,
+        "template_id": "BI_126",
+        "question": "What is the average selling price?",
+        "sql": "SELECT AVG(MRP) Average_Selling_Price FROM Fact_Financial_Metrics;"
+    },
+    {
+        "prompt_id": 151,
+        "template_id": "BI_128",
+        "question": "What is the inventory turnover ratio?",
+        "sql": "SELECT SUM(NET_SALE_COGS_AMOUNT)/NULLIF(AVG(Inventory_Cost),0) AS Inventory_Turnover FROM Fact_Financial_Metrics;"
+    },
+    {
+        "prompt_id": 152,
+        "template_id": "BI_129",
+        "question": "What is the stock-to-sales ratio?",
+        "sql": "SELECT SUM(CLOSING_STOCK_QUANTITY)/NULLIF(SUM(NET_SALE_QUANTITY),0) AS Stock_To_Sales_Ratio FROM Fact_Financial_Metrics;"
+    },
+    {
+        "prompt_id": 153,
+        "template_id": "BI_130",
+        "question": "Which department has the fastest turnover?",
+        "sql": "SELECT o.Department,SUM(f.NET_SALE_QUANTITY)/NULLIF(AVG(f.Inventory_Cost),0) AS Turnover FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Turnover DESC LIMIT 1;"
+    },
+    {
+        "prompt_id": 154,
+        "template_id": "AI_131",
+        "question": "Which products should I reorder today?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10;"
+    },
+    {
+        "prompt_id": 155,
+        "template_id": "AI_132",
+        "question": "Which products should I discount?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)>100 AND SUM(f.NET_SALE_QUANTITY)<5;"
+    },
+    {
+        "prompt_id": 156,
+        "template_id": "AI_133",
+        "question": "Which products should I promote?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING AVG(f.Gross_Margin_Pct)>30;"
+    },
+    {
+        "prompt_id": 157,
+        "template_id": "AI_134",
+        "question": "Which products should I discontinue?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0 AND SUM(f.CLOSING_STOCK_QUANTITY)>10;"
+    },
+    {
+        "prompt_id": 158,
+        "template_id": "AI_135",
+        "question": "Which products should I stock more?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)>50 AND SUM(f.CLOSING_STOCK_QUANTITY)<10;"
+    },
+    {
+        "prompt_id": 159,
+        "template_id": "AI_140",
+        "question": "Which products should be displayed at the entrance?",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC,Profit DESC LIMIT 20;"
+    },
+    {
+        "prompt_id": 160,
+        "template_id": "EXEC_143",
+        "question": "Give me this month's business summary.",
+        "sql": "SELECT SUM(NET_SALE_AMOUNT) Revenue,SUM(Gross_Profit) Profit,SUM(NET_SALE_QUANTITY) Qty,SUM(CLOSING_STOCK_AMOUNT) Inventory_Value FROM Fact_Financial_Metrics;"
+    },
+    {
+        "prompt_id": 161,
+        "template_id": "EXEC_144",
+        "question": "Show my top 10 products.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 10;"
+    },
+    {
+        "prompt_id": 162,
+        "template_id": "EXEC_145",
+        "question": "Show my bottom 10 products.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue ASC LIMIT 10;"
+    },
+    {
+        "prompt_id": 163,
+        "template_id": "EXEC_146",
+        "question": "Show all products below reorder level.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<10;"
+    },
+    {
+        "prompt_id": 164,
+        "template_id": "EXEC_147",
+        "question": "Show inventory worth more than ₹50000.",
+        "sql": "SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_AMOUNT) Inventory_Value FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_AMOUNT)>50000;"
     }
 ]

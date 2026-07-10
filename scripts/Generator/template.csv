@@ -1,0 +1,244 @@
+template_id,question_template,expand,supported,sql_template
+SALES_001,Which is the best-selling product?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
+SALES_001_DIVISION,Which is the best-selling product in {Division}?,Division,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Division='{Division}' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
+SALES_001_SECTION,Which is the best-selling product in {Section}?,Section,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Section='{Section}' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
+SALES_001_DEPARTMENT,Which is the best-selling product in {Department}?,Department,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID JOIN Dim_Organization o ON f.Org_ID=o.Org_ID WHERE o.Department='{Department}' GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
+SALES_002,Show top 10 best-selling products.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 10;"
+SALES_003,Which product generated the highest revenue?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 1;"
+SALES_004,Which product sold maximum quantity?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) AS Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
+SALES_005,Which department sells the most?,,True,"SELECT o.Department,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON f.Org_ID=o.Org_ID GROUP BY o.Department ORDER BY Revenue DESC LIMIT 1;"
+SALES_006,Which supplier sells the most?,,True,"SELECT s.PARTYNAME,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON f.Supplier_ID=s.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Revenue DESC LIMIT 1;"
+SALES_020,Which new arrival is selling the fastest?,,True,"SELECT p.ICODE,p.DESC1,p.STOCKINDATE,SUM(f.NET_SALE_QUANTITY) AS Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID WHERE p.STOCKINDATE>=CURRENT_DATE-INTERVAL 30 DAY GROUP BY p.ICODE,p.DESC1,p.STOCKINDATE ORDER BY Qty DESC LIMIT 1;"
+TOP_021,Show top 10 products.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 10;"
+TOP_022,Show top 20 selling products.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) AS Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 20;"
+TOP_025,Which products haven't sold this month?,,True,"SELECT p.ICODE,p.DESC1 FROM Fact_Financial_Metrics f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0;"
+TOP_027,Which products are slow moving?,,True,"SELECT p.ICODE,p.DESC1,v.Avg_STR,v.Velocity_Class FROM Product_Stock_Velocity v JOIN Dim_Product p ON v.Product_ID=p.Product_ID WHERE v.Velocity_Class='Slow' ORDER BY v.Avg_STR;"
+TOP_028,Which products are fast moving?,,True,"SELECT p.ICODE,p.DESC1,v.Avg_STR,v.Velocity_Class FROM Product_Stock_Velocity v JOIN Dim_Product p ON v.Product_ID=p.Product_ID WHERE v.Velocity_Class='Fast' ORDER BY v.Avg_STR DESC;"
+TOP_029,Which products sold out quickly?,,False,
+TOP_030,Which products need immediate restocking?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON f.Product_ID=p.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{REORDER_LEVEL} ORDER BY Stock;"
+template_id,question_template,expand,supported,sql_template
+
+SIZE_031,Which size sells the most?,,False,
+SIZE_032,Which size sells the least?,,False,
+SIZE_033,Which size is running out of stock?,,False,
+SIZE_034,Which size has excess inventory?,,False,
+SIZE_035,Which size has the highest returns?,,False,
+SIZE_036,Which product sells most in XL?,,False,
+SIZE_037,Which product sells most in XXL?,,False,
+SIZE_038,Which product sells most in M?,,False,
+SIZE_039,Which product sells most in L?,,False,
+SIZE_040,Which product sells most in S?,,False,
+COLOR_041,Which colour sells the most?,,False,
+COLOR_042,Which colour sells the least?,,False,
+COLOR_043,Which colour is currently out of stock?,,False,
+COLOR_044,Which colour has excess inventory?,,False,
+COLOR_045,Which colour generates the highest revenue?,,False,
+COLOR_046,Which colour sells best in festive season?,,False,
+COLOR_047,Which colour sells best during weekends?,,False,
+COLOR_048,Which colour has the highest demand?,,False,
+COLOR_049,Which colour should we reorder?,,False,
+COLOR_050,Which colour is not performing?,,False,
+
+INV_051,What is the current inventory value?,,True,"SELECT SUM(CLOSING_STOCK_AMOUNT) AS Inventory_Value FROM Fact_Inventory_Sales;"
+
+INV_052,How many products are currently in stock?,,True,"SELECT SUM(CLOSING_STOCK_QUANTITY) AS Total_Stock FROM Fact_Inventory_Sales;"
+
+INV_053,How many unique products are available?,,True,"SELECT COUNT(DISTINCT Product_ID) AS Total_Products FROM Fact_Inventory_Sales;"
+
+INV_054,Which items are below minimum stock?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{MIN_STOCK};"
+
+INV_055,Which items are out of stock?,,True,"SELECT p.ICODE,p.DESC1 FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)=0;"
+
+INV_056,Which items have excess stock?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)>{MAX_STOCK};"
+
+INV_057,Which items need replenishment?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) AS Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{REORDER_LEVEL};"
+
+INV_058,Which items haven't moved in 90 days?,,False,
+
+INV_059,Which inventory is dead stock?,,True,"SELECT p.ICODE,p.DESC1 FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0;"
+
+INV_060,Which inventory is aging?,,False,
+
+MOVE_061,Which product moved the fastest today?,,False,
+
+MOVE_062,Which product moved the fastest this week?,,False,
+
+MOVE_063,Which product moved the fastest this month?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
+
+MOVE_064,Which product is not moving?,,True,"SELECT p.ICODE,p.DESC1 FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0;"
+
+MOVE_065,What is today's stock movement?,,False,
+
+MOVE_066,Show incoming stock.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.GOODS_RECEIVE_QUANTITY) AS Received FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Received DESC;"
+
+MOVE_067,Show outgoing stock.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) AS Sold FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Sold DESC;"
+
+MOVE_068,Which stock arrived today?,,False,
+
+MOVE_069,Which stock was sold today?,,False,
+
+MOVE_070,Which stock needs adjustment?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.ADJUSTMENT_QUANTITY) Adjustment FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.ADJUSTMENT_QUANTITY)<>0;"
+
+PUR_071,Which supplier provides the best-selling products?,,True,"SELECT s.PARTYNAME,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Revenue DESC LIMIT 1;"
+
+PUR_072,Which supplier has delayed deliveries?,,False,
+
+PUR_073,Which supplier supplies the highest quantity?,,True,"SELECT s.PARTYNAME,SUM(f.GOODS_RECEIVE_QUANTITY) Qty FROM Fact_Inventory_Sales f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Qty DESC LIMIT 1;"
+
+PUR_074,Which supplier's products sell the fastest?,,True,"SELECT s.PARTYNAME,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Qty DESC LIMIT 1;"
+
+PUR_075,Which supplier has the lowest sales?,,True,"SELECT s.PARTYNAME,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Revenue ASC LIMIT 1;"
+
+template_id,question_template,expand,supported,sql_template
+
+PUR_076,Which supplier should we reorder from?,,True,"SELECT s.PARTYNAME,SUM(f.GOODS_RECEIVE_QUANTITY) Received,SUM(f.NET_SALE_QUANTITY) Sold,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{REORDER_LEVEL} ORDER BY Sold DESC;"
+
+PUR_077,Which purchase order is pending?,,False,
+
+PUR_078,Which purchase order is overdue?,,False,
+
+PUR_079,Which supplier has the best stock turnover?,,True,"SELECT s.PARTYNAME,SUM(f.NET_SALE_QUANTITY)/NULLIF(AVG(f.Inventory_Cost),0) AS Turnover FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Turnover DESC LIMIT 1;"
+
+PUR_080,Which supplier provides premium products?,,False,
+
+PROFIT_081,Which product gives the highest profit?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Profit DESC LIMIT 1;"
+
+PROFIT_082,Which product gives the lowest profit?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Profit ASC LIMIT 1;"
+
+PROFIT_083,Which department is most profitable?,,True,"SELECT o.Department,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Profit DESC LIMIT 1;"
+
+PROFIT_084,Which supplier is most profitable?,,True,"SELECT s.PARTYNAME,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Supplier s ON s.Supplier_ID=f.Supplier_ID GROUP BY s.PARTYNAME ORDER BY Profit DESC LIMIT 1;"
+
+PROFIT_085,Which product has the highest margin?,,True,"SELECT p.ICODE,p.DESC1,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Margin DESC LIMIT 1;"
+
+PROFIT_086,Which product has the lowest margin?,,True,"SELECT p.ICODE,p.DESC1,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Margin ASC LIMIT 1;"
+
+PROFIT_087,Which products should be promoted?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING AVG(f.Gross_Margin_Pct)>{MIN_MARGIN} ORDER BY Profit DESC;"
+
+PROFIT_088,Which products are losing money?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.Gross_Profit)<0 ORDER BY Profit;"
+
+PROFIT_089,Which products have high sales but low profit?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_AMOUNT)>{HIGH_REVENUE} AND SUM(f.Gross_Profit)<{LOW_PROFIT};"
+
+PROFIT_090,Which products have low sales but high margins?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_AMOUNT)<{LOW_REVENUE} AND AVG(f.Gross_Margin_Pct)>{HIGH_MARGIN};"
+
+CUSTOMER_091,What do customers buy the most?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
+
+CUSTOMER_092,Which products are purchased together?,,False,
+
+CUSTOMER_093,Which size do customers prefer?,,False,
+
+CUSTOMER_094,Which colour do customers prefer?,,False,
+
+CUSTOMER_095,Which collection attracts repeat customers?,,False,
+
+CUSTOMER_096,Which product has the highest repeat purchase?,,False,
+
+CUSTOMER_097,Which products are bought during festivals?,,False,
+
+CUSTOMER_098,Which products sell more on weekends?,,False,
+
+CUSTOMER_099,Which products sell more in the evening?,,False,
+
+CUSTOMER_100,Which products are popular among new customers?,,False,
+
+TIME_101,What sold the most today?,,False,
+
+TIME_102,What sold the most yesterday?,,False,
+
+TIME_103,What sold the most this week?,,False,
+
+TIME_104,What sold the most this month?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Qty DESC LIMIT 1;"
+
+TIME_105,What sold the most this year?,,False,
+
+TIME_106,Which month had the highest sales?,,False,
+
+TIME_107,Which day has the highest sales?,,True,"SELECT d.Date,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Date d ON d.Date_ID=f.Date_ID GROUP BY d.Date ORDER BY Revenue DESC LIMIT 1;"
+
+TIME_108,Which hour has the highest sales?,,False,
+
+TIME_109,Which week had the maximum sales?,,False,
+
+TIME_110,Compare this month with last month.,,False,
+
+template_id,question_template,expand,supported,sql_template
+
+ALERT_111,Which items are about to be out of stock?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{LOW_STOCK};"
+
+ALERT_112,Which products need urgent replenishment?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{REORDER_LEVEL};"
+
+ALERT_113,Which products have zero inventory?,,True,"SELECT p.ICODE,p.DESC1 FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)=0;"
+
+ALERT_114,Which products have negative stock?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<0;"
+
+ALERT_115,Which products have inventory mismatch?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock,SUM(f.CLOSING_TRANSIT_QUANTITY) Transit FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<>SUM(f.CLOSING_TRANSIT_QUANTITY);"
+
+ALERT_116,Which products need stock verification?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.ADJUSTMENT_QUANTITY) Adjustment FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.ADJUSTMENT_QUANTITY)<>0;"
+
+ALERT_117,Which products are overstocked?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)>{OVERSTOCK_LEVEL};"
+
+ALERT_118,Which products are understocked?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{UNDERSTOCK_LEVEL};"
+
+ALERT_119,Which products have not sold in 60 days?,,False,
+
+ALERT_120,Which products should be discontinued?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0 AND SUM(f.CLOSING_STOCK_QUANTITY)>{DISCONTINUE_STOCK};"
+
+BI_121,What is today's revenue?,,False,
+
+BI_122,What is today's profit?,,False,
+
+BI_123,What is today's total sales quantity?,,False,
+
+BI_124,Which department contributes the highest revenue?,,True,"SELECT o.Department,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Revenue DESC LIMIT 1;"
+
+BI_125,Which department contributes the highest profit?,,True,"SELECT o.Department,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Profit DESC LIMIT 1;"
+
+BI_126,What is the average selling price?,,True,"SELECT AVG(MRP) Average_Selling_Price FROM Fact_Financial_Metrics;"
+
+BI_127,What is the average order value?,,False,
+
+BI_128,What is the inventory turnover ratio?,,True,"SELECT SUM(NET_SALE_COGS_AMOUNT)/NULLIF(AVG(Inventory_Cost),0) AS Inventory_Turnover FROM Fact_Financial_Metrics;"
+
+BI_129,What is the stock-to-sales ratio?,,True,"SELECT SUM(CLOSING_STOCK_QUANTITY)/NULLIF(SUM(NET_SALE_QUANTITY),0) AS Stock_To_Sales_Ratio FROM Fact_Financial_Metrics;"
+
+BI_130,Which department has the fastest turnover?,,True,"SELECT o.Department,SUM(f.NET_SALE_QUANTITY)/NULLIF(AVG(f.Inventory_Cost),0) AS Turnover FROM Fact_Financial_Metrics f JOIN Dim_Organization o ON o.Org_ID=f.Org_ID GROUP BY o.Department ORDER BY Turnover DESC LIMIT 1;"
+
+AI_131,Which products should I reorder today?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{REORDER_LEVEL};"
+
+AI_132,Which products should I discount?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock,SUM(f.NET_SALE_QUANTITY) Qty FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)>{OVERSTOCK_LEVEL} AND SUM(f.NET_SALE_QUANTITY)<{LOW_SALES};"
+
+AI_133,Which products should I promote?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.Gross_Profit) Profit,AVG(f.Gross_Margin_Pct) Margin FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING AVG(f.Gross_Margin_Pct)>{PROMOTION_MARGIN};"
+
+AI_134,Which products should I discontinue?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)=0 AND SUM(f.CLOSING_STOCK_QUANTITY)>{DISCONTINUE_STOCK};"
+
+AI_135,Which products should I stock more?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_QUANTITY) Qty,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.NET_SALE_QUANTITY)>{HIGH_SALES} AND SUM(f.CLOSING_STOCK_QUANTITY)<{LOW_STOCK};"
+
+AI_136,Which products are expected to sell out next week?,,False,
+
+AI_137,Which products are likely to become dead stock?,,False,
+
+AI_138,Which products have rising demand?,,False,
+
+AI_139,Which products have falling demand?,,False,
+
+AI_140,Which products should be displayed at the entrance?,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue,SUM(f.Gross_Profit) Profit FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC,Profit DESC LIMIT 20;"
+
+EXEC_141,Give me today's business summary.,,False,
+
+EXEC_142,Give me this week's business summary.,,False,
+
+EXEC_143,Give me this month's business summary.,,True,"SELECT SUM(NET_SALE_AMOUNT) Revenue,SUM(Gross_Profit) Profit,SUM(NET_SALE_QUANTITY) Qty,SUM(CLOSING_STOCK_AMOUNT) Inventory_Value FROM Fact_Financial_Metrics;"
+
+EXEC_144,Show my top 10 products.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue DESC LIMIT 10;"
+
+EXEC_145,Show my bottom 10 products.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.NET_SALE_AMOUNT) Revenue FROM Fact_Financial_Metrics f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 ORDER BY Revenue ASC LIMIT 10;"
+
+EXEC_146,Show all products below reorder level.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_QUANTITY) Stock FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_QUANTITY)<{REORDER_LEVEL};"
+
+EXEC_147,Show inventory worth more than ₹50000.,,True,"SELECT p.ICODE,p.DESC1,SUM(f.CLOSING_STOCK_AMOUNT) Inventory_Value FROM Fact_Inventory_Sales f JOIN Dim_Product p ON p.Product_ID=f.Product_ID GROUP BY p.ICODE,p.DESC1 HAVING SUM(f.CLOSING_STOCK_AMOUNT)>50000;"
+
+EXEC_148,Show products with the highest growth.,,False,
+
+EXEC_149,Show products with the biggest sales decline.,,False,
+
+EXEC_150,How is the store performing overall today?,,False,
