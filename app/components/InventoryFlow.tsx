@@ -5,6 +5,7 @@ import { useDashboard } from "../DashboardContext";
 import * as echarts from "echarts";
 import { ShieldAlert, PieChart as PieIcon } from "lucide-react";
 import { getChartTheme, CHART_COLORS } from "../../lib/chartUtils";
+import { API_BASE_URL } from "../../lib/utils";
 
 export default function InventoryFlow() {
   const { filters, theme } = useDashboard();
@@ -32,7 +33,7 @@ export default function InventoryFlow() {
         if (filters.endDate) queryParams.append("end_date", filters.endDate);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/sales-charts?${queryParams.toString()}`
+          `${API_BASE_URL}/api/v1/analytics/sales-charts?${queryParams.toString()}`
         );
         if (!res.ok) throw new Error("Failed to fetch inventory chart data");
         const data = await res.json();

@@ -19,7 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn, API_BASE_URL } from "../../lib/utils";
 
 /* ─── Types ────────────────────────────────────────────────────── */
 interface Message {
@@ -368,7 +368,7 @@ export default function AIChat() {
       setActiveId(first.id);
     }
     // Seed fixed-query suggestions from the backend
-    fetch("http://127.0.0.1:8000/api/v1/ai/suggestions")
+    fetch(`${API_BASE_URL}/api/v1/ai/suggestions`)
       .then((r) => r.json())
       .then((d) => setSuggestions(d.suggestions || []))
       .catch(() => {});
@@ -446,7 +446,7 @@ export default function AIChat() {
       setLoading(true);
 
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/v1/ai/query", {
+        const res = await fetch(`${API_BASE_URL}/api/v1/ai/query`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query: text }),

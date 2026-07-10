@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useDashboard } from "../DashboardContext";
 import { DollarSign, ShieldAlert, Award, Inbox, ArrowUpRight, TrendingUp } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn, API_BASE_URL } from "../../lib/utils";
 
 type KPIData = {
   total_products: number;
@@ -82,7 +82,7 @@ export default function KPIsGrid() {
         if (filters.maxMrp) queryParams.append("max_mrp", String(filters.maxMrp));
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/dashboard-kpis?${queryParams.toString()}`
+          `${API_BASE_URL}/api/v1/analytics/dashboard-kpis?${queryParams.toString()}`
         );
         if (res.ok) {
           const result = await res.json();

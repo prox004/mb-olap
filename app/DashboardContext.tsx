@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { API_BASE_URL } from "@/lib/utils";
 
 export type Filters = {
   division: string[];
@@ -93,7 +94,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function fetchOptions() {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/v1/filters");
+        const res = await fetch(`${API_BASE_URL}/api/v1/filters`);
         if (res.ok) {
           const data = await res.json();
           setFilterOptions(data);

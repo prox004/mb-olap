@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useDashboard } from "../DashboardContext";
 import { Search, TrendingUp, TrendingDown, ShieldAlert, X } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn, API_BASE_URL } from "../../lib/utils";
 
 type DepartmentStat = {
   department: string;
@@ -56,7 +56,7 @@ export default function DepartmentInsights() {
         if (filters.endDate) queryParams.append("end_date", filters.endDate);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/departments?${queryParams.toString()}`
+          `${API_BASE_URL}/api/v1/analytics/departments?${queryParams.toString()}`
         );
         if (res.ok) {
           const result = await res.json();
@@ -85,7 +85,7 @@ export default function DepartmentInsights() {
       setLoadingProducts(true);
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/departments/top-products?department_name=${encodeURIComponent(
+          `${API_BASE_URL}/api/v1/analytics/departments/top-products?department_name=${encodeURIComponent(
             selectedDept.department
           )}`
         );

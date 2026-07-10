@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Search, ShieldAlert, AlertTriangle, X } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn, API_BASE_URL } from "../../lib/utils";
 
 type SearchResult = {
   icode: string;
@@ -27,7 +27,7 @@ export default function ProductInsights() {
       setLoading(true);
       setError(false);
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/v1/search?q=${encodeURIComponent(q)}`);
+        const res = await fetch(`${API_BASE_URL}/api/v1/search?q=${encodeURIComponent(q)}`);
         if (res.ok) {
           const data = await res.json();
           setResults(data.results);

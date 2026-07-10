@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDashboard } from "../DashboardContext";
 import * as echarts from "echarts";
 import { LineChart, Calendar, AlertCircle, Sparkles } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn, API_BASE_URL } from "../../lib/utils";
 import { getChartTheme, CHART_COLORS } from "../../lib/chartUtils";
 
 type ForecastData = {
@@ -49,7 +49,7 @@ export default function Forecasting() {
         filters.category.forEach((val) => queryParams.append("category", val));
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/forecast?${queryParams.toString()}`
+          `${API_BASE_URL}/api/v1/analytics/forecast?${queryParams.toString()}`
         );
         if (res.ok) {
           const result = await res.json();

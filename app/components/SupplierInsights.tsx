@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useDashboard } from "../DashboardContext";
 import { Search, TrendingUp, TrendingDown, ShieldAlert, Award, Package, Percent, FileText, X } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn, API_BASE_URL } from "../../lib/utils";
 
 type SupplierStat = {
   supplier: string;
@@ -56,7 +56,7 @@ export default function SupplierInsights() {
         if (filters.endDate) queryParams.append("end_date", filters.endDate);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/suppliers?${queryParams.toString()}`
+          `${API_BASE_URL}/api/v1/analytics/suppliers?${queryParams.toString()}`
         );
         if (res.ok) {
           const result = await res.json();
@@ -86,7 +86,7 @@ export default function SupplierInsights() {
       setLoadingProducts(true);
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/suppliers/top-products?partyname=${encodeURIComponent(
+          `${API_BASE_URL}/api/v1/analytics/suppliers/top-products?partyname=${encodeURIComponent(
             selectedSupplier.supplier
           )}`
         );

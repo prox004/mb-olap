@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useDashboard } from "../DashboardContext";
 import { Search, TrendingUp, TrendingDown, ShieldAlert, Award, X } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn, API_BASE_URL } from "../../lib/utils";
 
 type CategoryStat = {
   category: string;
@@ -56,7 +56,7 @@ export default function CategoryInsights() {
         if (filters.endDate) queryParams.append("end_date", filters.endDate);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/categories?${queryParams.toString()}`
+          `${API_BASE_URL}/api/v1/analytics/categories?${queryParams.toString()}`
         );
         if (res.ok) {
           const result = await res.json();
@@ -86,7 +86,7 @@ export default function CategoryInsights() {
       setLoadingProducts(true);
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/v1/analytics/categories/top-products?category_name=${encodeURIComponent(
+          `${API_BASE_URL}/api/v1/analytics/categories/top-products?category_name=${encodeURIComponent(
             selectedCategory.category
           )}`
         );
